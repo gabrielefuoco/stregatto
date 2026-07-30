@@ -1,0 +1,86 @@
+/* themes.css */
+@import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Default fonts */
+  --font-base: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  --font-serif: 'Georgia', 'Cambria', 'Times New Roman', serif;
+}
+
+/* LIGHT THEME */
+:root[data-theme="light"] {
+  --bg-primary: #fdfdfc;
+  --bg-secondary: #f4f4f5;
+  --bg-canvas: #f9f9f8;
+  --bg-border: #e4e4e7;
+  
+  --text-primary: #1e1b18;
+  --text-secondary: #71717a;
+  
+  --accent-color: #d97757; /* Claude Rust */
+  --accent-hover: #c26144;
+  
+  --msg-user: #f4f4f5;
+  --msg-agent: transparent;
+}
+
+/* DARK THEME */
+:root[data-theme="dark"] {
+  --bg-primary: #151414;
+  --bg-secondary: #1f1e1e;
+  --bg-canvas: #0e0d0d;
+  --bg-border: #2d2d2d;
+  
+  --text-primary: #e6e4e2;
+  --text-secondary: #858585;
+  
+  --accent-color: #d97757;
+  --accent-hover: #e2896c;
+  
+  --msg-user: #27272a;
+  --msg-agent: transparent;
+}
+
+/* Apply Base Settings */
+body {
+  font-family: var(--font-base);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Scrollbar styling for modern look */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary); 
+}
+::-webkit-scrollbar-thumb {
+  background: var(--bg-border); 
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary); 
+}
+
+/* Typography Overrides */
+.markdown-body {
+  color: var(--text-primary) !important;
+  font-family: var(--font-base) !important;
+}
+.markdown-body pre {
+  background-color: var(--bg-secondary) !important;
+  border: 1px solid var(--bg-border);
+}
+.markdown-body code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
+  background-color: var(--bg-secondary);
+  padding: 0.1em 0.3em;
+  border-radius: 3px;
+}
+
+.cm-editor { height: 100%; }
+.cm-scroller { overflow: auto; }
+

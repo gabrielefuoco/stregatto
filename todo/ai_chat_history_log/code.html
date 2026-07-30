@@ -1,0 +1,276 @@
+<!DOCTYPE html><html class="h-full" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>AI Assistant - History</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&amp;family=Work+Sans:wght@400;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary": "#5e5e5e",
+                        "outline-variant": "#e3bfb3",
+                        "on-secondary-fixed-variant": "#474747",
+                        "inverse-surface": "#2f3131",
+                        "on-error": "#ffffff",
+                        "inverse-primary": "#ffb59c",
+                        "tertiary-fixed": "#e2e2e2",
+                        "on-primary-container": "#561700",
+                        "primary-container": "#ff5f1f",
+                        "on-surface-variant": "#5b4138",
+                        "on-surface": "#1a1c1c",
+                        "surface-container-highest": "#e2e2e2",
+                        "secondary-container": "#e2e2e2",
+                        "primary-fixed": "#ffdbcf",
+                        "surface-container": "#eeeeee",
+                        "primary-fixed-dim": "#ffb59c",
+                        "surface-variant": "#e2e2e2",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "surface-tint": "#ab3600",
+                        "on-tertiary": "#ffffff",
+                        "on-background": "#1a1c1c",
+                        "on-secondary-container": "#646464",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-high": "#e8e8e8",
+                        "error": "#ba1a1a",
+                        "secondary-fixed-dim": "#c6c6c6",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "surface-bright": "#f9f9f9",
+                        "surface": "#f9f9f9",
+                        "outline": "#8f7066",
+                        "surface-container-low": "#f3f3f4",
+                        "on-tertiary-container": "#2b2d2d",
+                        "on-error-container": "#93000a",
+                        "surface-dim": "#dadada",
+                        "on-secondary-fixed": "#1b1b1b",
+                        "error-container": "#ffdad6",
+                        "background": "#f9f9f9",
+                        "secondary-fixed": "#e2e2e2",
+                        "tertiary": "#5d5f5f",
+                        "on-primary-fixed": "#390c00",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "tertiary-container": "#939494",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed-variant": "#832700",
+                        "inverse-on-surface": "#f0f1f1",
+                        "primary": "#ab3600"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "margin-desktop": "64px",
+                        "lg": "24px",
+                        "sm": "8px",
+                        "xs": "4px",
+                        "margin-mobile": "16px",
+                        "xl": "40px",
+                        "unit": "4px",
+                        "gutter": "20px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Work Sans"],
+                        "label-sm": ["Space Grotesk"],
+                        "headline-md": ["Space Grotesk"],
+                        "headline-xl": ["Space Grotesk"],
+                        "headline-lg": ["Space Grotesk"],
+                        "body-md": ["Work Sans"],
+                        "headline-lg-mobile": ["Space Grotesk"],
+                        "label-md": ["Space Grotesk"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-xl": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "34px", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .neo-shadow {
+            box-shadow: 4px 4px 0px 0px rgba(0,0,0,1);
+        }
+        .neo-shadow-hover:hover {
+            box-shadow: 4px 4px 0px 0px rgba(255,95,31,1);
+            transform: translate(-2px, -2px);
+        }
+        .neo-border {
+            border: 2px solid #1a1c1c;
+        }
+        .neo-border-bottom {
+            border-bottom: 2px solid #1a1c1c;
+        }
+        .neo-border-right {
+            border-right: 2px solid #1a1c1c;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background h-full font-body-md overflow-hidden flex flex-col md:flex-row">
+<!-- TopAppBar (Mobile Only) -->
+<header class="md:hidden w-full neo-border-bottom bg-surface-container-lowest flex justify-between items-center px-lg py-sm z-20 sticky top-0">
+<div class="font-headline-md text-headline-md font-black text-on-surface tracking-tight">Chat Studio</div>
+<div class="flex gap-md">
+<button class="text-on-surface-variant hover:text-on-surface active:opacity-80 transition-colors">
+<span class="material-symbols-outlined" data-icon="dark_mode">dark_mode</span>
+</button>
+<button class="text-on-surface-variant hover:text-on-surface active:opacity-80 transition-colors">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+</div>
+</header>
+<!-- SideNavBar (Desktop) -->
+<nav class="hidden md:flex flex-col h-screen w-64 neo-border-right bg-surface z-20 shrink-0">
+<div class="p-md flex flex-col h-full">
+<!-- Brand / Header -->
+<div class="mb-xl flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full neo-border overflow-hidden shrink-0">
+<img class="w-full h-full object-cover" data-alt="A small, stylized avatar image representing a minimalist user profile, featuring bold black outlines and a soft pastel background, fitting the neo-brutalist aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDY1nKJGfA8BEHuj1QLsf_GbC2WWEk9V2eoXU4KbPrs4r9RBpyYWL6t8tNIVqfmP-G_jv5NsdlsnPXkvMZZPkP6kZczidliQTocWJf7OPHdNdaDtuVc42uKqn7e1arMnzkSVo_D3KWZrHvoHb-rrNrgjm2A8k19FIJDwMC3HtFy1U3N0Cn0KhjOlZa8aVuNrxueDh9ayBVElpxMTxmmLplpHo1b1z_hWnEqfUlA9Re8iOAT5XwxnP-8">
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-on-surface leading-tight">AI Assistant</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Neo-Brutalist v1.0</p>
+</div>
+</div>
+<!-- Navigation Links -->
+<ul class="flex-1 space-y-sm"><li class=""><a class="flex items-center gap-sm px-sm py-xs rounded text-on-surface-variant hover:bg-surface-variant transition-colors font-headline-md text-[18px]" href="#"><span class="material-symbols-outlined">add_comment</span>New Chat</a></li><li class=""><a class="flex items-center gap-sm px-sm py-xs rounded text-on-surface-variant hover:bg-surface-variant transition-colors font-headline-md text-[18px]" href="#"><span class="material-symbols-outlined">grid_view</span>Agents Gallery</a></li><li class=""><a class="flex items-center gap-sm px-sm py-xs bg-primary-container text-on-primary-container neo-border shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all font-headline-md text-[18px]" href="#"><span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 1;">history</span>History</a></li><li class=""><a class="flex items-center gap-sm px-sm py-xs rounded text-on-surface-variant hover:bg-surface-variant transition-colors font-headline-md text-[18px]" href="#"><span class="material-symbols-outlined">extension</span>Plugins</a></li><li class=""><a class="flex items-center gap-sm px-sm py-xs rounded text-on-surface-variant hover:bg-surface-variant transition-colors font-headline-md text-[18px]" href="#"><span class="material-symbols-outlined">settings</span>Settings</a></li></ul>
+<!-- CTA -->
+<div class="mt-auto pt-md">
+
+</div>
+</div>
+</nav>
+<!-- Main Content Wrapper -->
+<div class="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
+<!-- TopAppBar (Desktop Content Area Header) -->
+<header class="hidden md:flex w-full neo-border-bottom bg-surface-container-lowest justify-between items-center px-lg py-sm shrink-0 z-10 sticky top-0">
+<div class="font-headline-md text-headline-md font-black text-on-surface tracking-tight">Chat Studio</div>
+<nav class="flex gap-lg font-label-md text-label-md"><a class="text-on-surface-variant hover:text-on-surface transition-colors" href="#">Agent Settings</a><a class="text-on-surface-variant hover:text-on-surface transition-colors" href="#">Knowledge</a></nav>
+<div class="flex items-center gap-md">
+<button class="text-on-surface-variant hover:bg-surface-variant p-1 rounded transition-colors active:opacity-80">
+<span class="material-symbols-outlined" data-icon="dark_mode">dark_mode</span>
+</button>
+<button class="text-on-surface-variant hover:bg-surface-variant p-1 rounded transition-colors active:opacity-80">
+
+</button>
+
+</div>
+</header>
+<!-- Scrollable Main Content -->
+<main class="flex-1 overflow-y-auto p-margin-mobile md:p-margin-desktop bg-background">
+<div class="max-w-4xl mx-auto">
+<!-- Page Header & Search -->
+<div class="mb-xl">
+<h2 class="font-headline-xl text-headline-xl text-on-background mb-lg">History</h2>
+<div class="relative w-full max-w-2xl">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="search">search</span>
+</div>
+<input class="w-full pl-10 pr-4 py-sm bg-surface-container-lowest neo-border text-on-surface placeholder:font-label-sm placeholder:text-on-surface-variant focus:outline-none focus:ring-0 focus:shadow-[2px_2px_0px_0px_#FF5F1F] transition-shadow font-body-md text-body-md rounded-none" placeholder="Search conversations..." type="text">
+</div>
+</div>
+<!-- History List -->
+<div class="space-y-xl">
+<!-- Section: Today -->
+<section>
+<h3 class="font-headline-md text-headline-md text-on-background border-b-2 border-on-surface pb-xs mb-md flex items-center gap-sm">
+<span class="w-3 h-3 bg-primary-container rounded-full neo-border inline-block"></span>
+                            Today
+                        </h3>
+<div class="space-y-md">
+<!-- Card 1 -->
+<div class="bg-surface-container-lowest neo-border p-md flex flex-col md:flex-row justify-between items-start md:items-center gap-md transition-all duration-200 neo-shadow-hover relative group cursor-pointer">
+<div class="flex-1 min-w-0">
+<div class="flex items-center gap-sm mb-xs">
+<h4 class="font-headline-md text-[20px] font-bold text-on-surface truncate">React Component Setup</h4>
+<span class="inline-flex items-center px-2 py-0.5 rounded-none neo-border bg-tertiary-fixed font-label-sm text-[10px] uppercase tracking-wider text-on-surface">Senior Developer</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant truncate">Here is the boilerplate for the new functional component using hooks...</p>
+</div>
+<div class="flex items-center gap-md w-full md:w-auto justify-between md:justify-end shrink-0">
+<span class="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap">10:42 AM</span>
+<div class="flex gap-sm opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1 hover:bg-surface-variant neo-border rounded-none bg-surface transition-colors" title="Pin">
+<span class="material-symbols-outlined text-[20px]" data-icon="push_pin">push_pin</span>
+</button>
+<button class="p-1 hover:bg-error-container hover:text-error neo-border rounded-none bg-surface transition-colors" title="Delete">
+<span class="material-symbols-outlined text-[20px]" data-icon="delete">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface-container-lowest neo-border p-md flex flex-col md:flex-row justify-between items-start md:items-center gap-md transition-all duration-200 neo-shadow-hover relative group cursor-pointer">
+<div class="flex-1 min-w-0">
+<div class="flex items-center gap-sm mb-xs">
+<h4 class="font-headline-md text-[20px] font-bold text-on-surface truncate">Explain Quantum Mechanics</h4>
+<span class="inline-flex items-center px-2 py-0.5 rounded-none neo-border bg-[#e3bfb3] font-label-sm text-[10px] uppercase tracking-wider text-on-surface">Tutor</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant truncate">Imagine a cat in a box. Until you open it, the cat is both alive and...</p>
+</div>
+<div class="flex items-center gap-md w-full md:w-auto justify-between md:justify-end shrink-0">
+<span class="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap">08:15 AM</span>
+<div class="flex gap-sm opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1 hover:bg-surface-variant neo-border rounded-none bg-surface transition-colors" title="Pin">
+<span class="material-symbols-outlined text-[20px]" data-icon="push_pin">push_pin</span>
+</button>
+<button class="p-1 hover:bg-error-container hover:text-error neo-border rounded-none bg-surface transition-colors" title="Delete">
+<span class="material-symbols-outlined text-[20px]" data-icon="delete">delete</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section: Yesterday -->
+<section>
+<h3 class="font-headline-md text-headline-md text-on-background border-b-2 border-on-surface pb-xs mb-md flex items-center gap-sm">
+<span class="w-3 h-3 bg-surface-variant rounded-full neo-border inline-block"></span>
+                            Yesterday
+                        </h3>
+<div class="space-y-md">
+<!-- Card 3 -->
+<div class="bg-surface-container-lowest neo-border p-md flex flex-col md:flex-row justify-between items-start md:items-center gap-md transition-all duration-200 neo-shadow-hover relative group cursor-pointer">
+<div class="flex-1 min-w-0">
+<div class="flex items-center gap-sm mb-xs">
+<span class="material-symbols-outlined text-primary-container text-[20px] shrink-0" data-icon="push_pin" data-weight="fill" style="font-variation-settings: &quot;FILL&quot; 1;">push_pin</span>
+<h4 class="font-headline-md text-[20px] font-bold text-on-surface truncate">Q3 Marketing Strategy</h4>
+<span class="inline-flex items-center px-2 py-0.5 rounded-none neo-border bg-tertiary-fixed font-label-sm text-[10px] uppercase tracking-wider text-on-surface">Marketing Pro</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant truncate">Let's focus on user acquisition through organic channels and...</p>
+</div>
+<div class="flex items-center gap-md w-full md:w-auto justify-between md:justify-end shrink-0">
+<span class="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap">Yesterday, 4:30 PM</span>
+<div class="flex gap-sm opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1 bg-surface-variant neo-border rounded-none transition-colors" title="Unpin">
+<span class="material-symbols-outlined text-[20px]" data-icon="push_pin">push_pin</span>
+</button>
+<button class="p-1 hover:bg-error-container hover:text-error neo-border rounded-none bg-surface transition-colors" title="Delete">
+<span class="material-symbols-outlined text-[20px]" data-icon="delete">delete</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div>
+</main>
+</div>
+
+
+</body></html>

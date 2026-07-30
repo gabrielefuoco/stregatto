@@ -1,0 +1,427 @@
+<!DOCTYPE html><html lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>AI Assistant - Agent Switcher</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;900&amp;family=Work+Sans:wght@400;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-low": "#f3f3f4",
+                      "tertiary": "#5d5f5f",
+                      "inverse-surface": "#2f3131",
+                      "on-error-container": "#93000a",
+                      "primary-fixed": "#ffdbcf",
+                      "surface-container-high": "#e8e8e8",
+                      "secondary-fixed": "#e2e2e2",
+                      "on-surface-variant": "#5b4138",
+                      "error": "#ba1a1a",
+                      "surface-container-highest": "#e2e2e2",
+                      "on-tertiary-container": "#2b2d2d",
+                      "on-secondary": "#ffffff",
+                      "secondary-container": "#e2e2e2",
+                      "primary-container": "#ff5f1f",
+                      "background": "#f9f9f9",
+                      "surface-variant": "#e2e2e2",
+                      "on-background": "#1a1c1c",
+                      "tertiary-fixed": "#e2e2e2",
+                      "on-tertiary": "#ffffff",
+                      "tertiary-fixed-dim": "#c6c6c7",
+                      "on-primary-fixed": "#390c00",
+                      "outline-variant": "#e3bfb3",
+                      "on-secondary-fixed-variant": "#474747",
+                      "on-error": "#ffffff",
+                      "inverse-on-surface": "#f0f1f1",
+                      "primary": "#ab3600",
+                      "inverse-primary": "#ffb59c",
+                      "surface": "#f9f9f9",
+                      "surface-bright": "#f9f9f9",
+                      "primary-fixed-dim": "#ffb59c",
+                      "surface-dim": "#dadada",
+                      "on-tertiary-fixed": "#1a1c1c",
+                      "on-primary-fixed-variant": "#832700",
+                      "tertiary-container": "#939494",
+                      "surface-container": "#eeeeee",
+                      "on-secondary-container": "#646464",
+                      "surface-tint": "#ab3600",
+                      "error-container": "#ffdad6",
+                      "on-secondary-fixed": "#1b1b1b",
+                      "secondary": "#5e5e5e",
+                      "on-tertiary-fixed-variant": "#454747",
+                      "on-primary-container": "#561700",
+                      "secondary-fixed-dim": "#c6c6c6",
+                      "on-surface": "#1a1c1c",
+                      "on-primary": "#ffffff",
+                      "surface-container-lowest": "#ffffff",
+                      "outline": "#8f7066"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "sm": "8px",
+                      "md": "16px",
+                      "lg": "24px",
+                      "gutter": "20px",
+                      "unit": "4px",
+                      "xl": "40px",
+                      "margin-mobile": "16px",
+                      "xs": "4px",
+                      "margin-desktop": "64px"
+              },
+              "fontFamily": {
+                      "headline-lg-mobile": [
+                              "Space Grotesk"
+                      ],
+                      "body-lg": [
+                              "Work Sans"
+                      ],
+                      "label-sm": [
+                              "Space Grotesk"
+                      ],
+                      "label-md": [
+                              "Space Grotesk"
+                      ],
+                      "headline-md": [
+                              "Space Grotesk"
+                      ],
+                      "headline-lg": [
+                              "Space Grotesk"
+                      ],
+                      "body-md": [
+                              "Work Sans"
+                      ],
+                      "headline-xl": [
+                              "Space Grotesk"
+                      ]
+              },
+              "fontSize": {
+                      "headline-lg-mobile": [
+                              "28px",
+                              {
+                                      "lineHeight": "34px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-xl": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        .neo-shadow {
+            box-shadow: 4px 4px 0px 0px rgba(0,0,0,1);
+        }
+        .neo-shadow-hover:hover {
+            box-shadow: 4px 4px 0px 0px rgba(0,0,0,1);
+            transform: translate(-2px, -2px);
+        }
+        .neo-shadow-active:active {
+            box-shadow: none;
+            transform: translate(2px, 2px);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md h-screen overflow-hidden flex selection:bg-primary-container selection:text-on-primary-container relative">
+<!-- Overlay for active dropdown -->
+<div class="absolute inset-0 bg-surface/50 backdrop-blur-sm z-40 transition-opacity duration-300 hidden" id="dropdown-overlay"></div>
+<!-- SideNavBar (from JSON) -->
+<nav class="hidden md:flex flex-col h-screen w-64 border-r-2 border-on-surface bg-surface p-md shrink-0 z-30">
+<div class="mb-xl flex items-center gap-sm">
+<div class="w-10 h-10 border-2 border-on-surface bg-primary-container flex items-center justify-center neo-shadow">
+<span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings: &quot;FILL&quot; 1;">smart_toy</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-on-surface">AI Assistant</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Neo-Brutalist v1.0</p>
+</div>
+</div>
+<ul class="flex flex-col gap-sm flex-1">
+<li class="">
+<a class="flex items-center gap-md p-sm bg-primary-container text-on-primary-container border-2 border-on-surface shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="add_comment">add_comment</span>
+<span class="font-label-md text-label-md">New Chat</span>
+</a>
+</li>
+<li class="">
+<a class="flex items-center gap-md p-sm text-on-surface-variant hover:bg-surface-variant border-2 border-transparent hover:border-on-surface hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span class="font-label-md text-label-md">History</span>
+</a>
+</li>
+<li class="">
+<a class="flex items-center gap-md p-sm text-on-surface-variant hover:bg-surface-variant border-2 border-transparent hover:border-on-surface hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span class="font-label-md text-label-md">Templates</span>
+</a>
+</li>
+<li class="">
+<a class="flex items-center gap-md p-sm text-on-surface-variant hover:bg-surface-variant border-2 border-transparent hover:border-on-surface hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</li>
+</ul>
+
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col min-w-0 bg-background relative z-30">
+<!-- TopAppBar (from JSON) -->
+<header class="flex justify-between items-center w-full px-lg py-sm bg-surface-container-lowest border-b-2 border-on-surface z-50 relative">
+<div class="flex items-center gap-md">
+<!-- Agent Switcher Trigger -->
+<button class="flex items-center gap-xs font-headline-md text-headline-md font-black text-on-surface hover:opacity-80 transition-opacity relative z-50" id="agent-switcher-btn">
+                    Chat Studio
+                    <span class="material-symbols-outlined text-[24px]">expand_more</span>
+</button>
+<!-- Agent Switcher Popover -->
+<div class="absolute top-[calc(100%+8px)] left-lg w-72 bg-surface-container-lowest border-2 border-on-surface shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] z-50 flex flex-col hidden" id="agent-popover">
+<div class="p-sm border-b-2 border-on-surface bg-surface-variant">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Recent Agents</span>
+</div>
+<ul class="flex flex-col">
+<li class="border-b-2 border-on-surface last:border-b-0">
+<button class="w-full flex items-center gap-md p-md hover:bg-surface-variant transition-colors text-left group">
+<div class="w-8 h-8 rounded-full border-2 border-on-surface bg-primary-fixed flex items-center justify-center group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[16px] text-on-primary-fixed">code</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Senior Developer</p>
+<p class="font-body-md text-[12px] text-on-surface-variant">Code generation &amp; review</p>
+</div>
+<span class="material-symbols-outlined ml-auto text-primary opacity-100 text-[18px]">check</span>
+</button>
+</li>
+<li class="border-b-2 border-on-surface last:border-b-0">
+<button class="w-full flex items-center gap-md p-md hover:bg-surface-variant transition-colors text-left group">
+<div class="w-8 h-8 rounded-full border-2 border-on-surface bg-tertiary-fixed flex items-center justify-center group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[16px] text-on-tertiary-fixed">gavel</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Legal Assistant</p>
+<p class="font-body-md text-[12px] text-on-surface-variant">Document analysis</p>
+</div>
+</button>
+</li>
+<li class="border-b-2 border-on-surface last:border-b-0">
+<button class="w-full flex items-center gap-md p-md hover:bg-surface-variant transition-colors text-left group">
+<div class="w-8 h-8 rounded-full border-2 border-on-surface bg-secondary-fixed flex items-center justify-center group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[16px] text-on-secondary-fixed">draw</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Creative Writer</p>
+<p class="font-body-md text-[12px] text-on-surface-variant">Copywriting &amp; ideation</p>
+</div>
+</button>
+</li>
+</ul>
+<div class="p-sm bg-surface-variant border-t-2 border-on-surface">
+<button class="w-full py-xs px-sm bg-surface-container-lowest border-2 border-on-surface font-label-md text-label-md hover:bg-primary-container hover:text-on-primary-container transition-colors flex items-center justify-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">grid_view</span>
+                            View all agents
+                        </button>
+</div>
+</div>
+</div>
+<nav class="hidden lg:flex items-center gap-lg">
+<a class="font-label-md text-label-md text-primary border-b-2 border-primary pb-1" href="#">Models</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" href="#">Knowledge</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" href="#">API</a>
+</nav>
+<div class="flex items-center gap-md">
+<button class="p-xs text-on-surface-variant hover:bg-surface-variant border-2 border-transparent hover:border-on-surface transition-colors rounded-none">
+<span class="material-symbols-outlined" data-icon="dark_mode">dark_mode</span>
+</button>
+<button class="p-xs text-on-surface-variant hover:bg-surface-variant border-2 border-transparent hover:border-on-surface transition-colors rounded-none">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+</button>
+<button class="px-md py-xs bg-primary-container text-on-primary-container font-label-md text-label-md border-2 border-on-surface neo-shadow-hover neo-shadow-active transition-all">
+                    Share
+                </button>
+</div>
+</header>
+<!-- Chat Workspace -->
+<main class="flex-1 flex overflow-hidden relative z-20">
+<!-- Left: Chat History -->
+<div class="flex-1 flex flex-col bg-surface-container-lowest relative">
+<div class="flex-1 overflow-y-auto p-lg flex flex-col gap-lg">
+<!-- User Message -->
+<div class="flex gap-md max-w-3xl ml-auto">
+<div class="bg-surface-variant border-2 border-on-surface p-md rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+<p class="font-body-md text-on-surface">Generate a React component for a data table with sortable columns and pagination.</p>
+</div>
+<div class="w-8 h-8 shrink-0 bg-secondary border-2 border-on-surface flex items-center justify-center">
+<span class="material-symbols-outlined text-on-secondary text-[16px]">person</span>
+</div>
+</div>
+<!-- AI Message -->
+<div class="flex gap-md mr-auto w-full">
+<div class="w-8 h-8 shrink-0 bg-primary-container border-2 border-on-surface flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container text-[16px]" style="font-variation-settings: &quot;FILL&quot; 1;">smart_toy</span>
+</div>
+<div class="border-on-surface rounded-none">
+<p class="font-body-md text-on-surface mb-md">Here's a complete implementation of a sortable, paginated data table in React using modern hooks.</p>
+<div class="border-2 border-on-surface bg-inverse-surface p-sm font-mono text-[14px] text-on-secondary overflow-x-auto">
+<pre><code>import React, { useState, useMemo } from 'react';
+
+const DataTable = ({ data, columns, pageSize = 10 }) =&gt; {
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
+  const [currentPage, setCurrentPage] = useState(1);
+  // ... more code
+};</code></pre>
+</div>
+</div>
+</div>
+</div>
+<!-- Input Area -->
+<div class="p-lg bg-surface-container-lowest border-t-2 border-on-surface">
+<div class="relative">
+<textarea class="w-full bg-surface border-2 border-on-surface p-md pr-xl font-body-md text-on-surface placeholder:text-on-surface-variant placeholder:font-headline-lg-mobile focus:outline-none focus:ring-0 focus:border-on-surface focus:shadow-[4px_4px_0px_0px_#ff5f1f] transition-shadow resize-none h-32" placeholder="Ask Senior Developer..."></textarea>
+<div class="absolute bottom-md right-md flex gap-sm">
+<button class="w-10 h-10 bg-surface-variant border-2 border-on-surface flex items-center justify-center hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined text-on-surface">attach_file</span>
+</button>
+<button class="w-10 h-10 bg-primary-container border-2 border-on-surface flex items-center justify-center neo-shadow-hover neo-shadow-active transition-all">
+<span class="material-symbols-outlined text-on-primary-container">send</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Right: Artifacts/Terminal -->
+<aside class="w-96 border-l-2 border-on-surface bg-surface-container flex flex-col hidden xl:flex">
+<div class="p-sm border-b-2 border-on-surface bg-tertiary text-on-tertiary flex items-center justify-between">
+<span class="font-label-md text-label-md flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">terminal</span>
+                        Terminal
+                    </span>
+<button class="hover:opacity-80"><span class="material-symbols-outlined text-[18px]">close</span></button>
+</div>
+<div class="flex-1 p-md bg-[#2f3131] text-[#e2e2e2] font-mono text-[13px] overflow-y-auto">
+<p class="text-[#8f7066]">$ npm run build</p>
+<p class="">&gt; react-app@0.1.0 build</p>
+<p class="">&gt; react-scripts build</p>
+<br>
+<p class="">Creating an optimized production build...</p>
+<p class="">Compiled successfully.</p>
+<br>
+<p class="text-primary-container">File sizes after gzip:</p>
+<p class="">  46.46 kB  build/static/js/main.xxxx.js</p>
+<p class="">  1.78 kB   build/static/css/main.xxxx.css</p>
+<br>
+<p class="text-[#e2e2e2]">$ <span class="animate-pulse">_</span></p>
+</div>
+<div class="h-1/2 border-t-2 border-on-surface bg-primary-fixed flex flex-col">
+<div class="p-sm border-b-2 border-on-surface bg-surface-variant text-on-surface flex items-center justify-between">
+<span class="font-label-md text-label-md flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">preview</span>
+                            Preview
+                        </span>
+<div class="flex gap-xs">
+<button class="hover:bg-surface p-xs border-2 border-transparent hover:border-on-surface"><span class="material-symbols-outlined text-[16px]">open_in_new</span></button>
+</div>
+</div>
+<div class="flex-1 p-md flex items-center justify-center bg-surface-container-highest">
+<div class="text-center">
+<span class="material-symbols-outlined text-[48px] text-tertiary mb-sm block">dashboard_customize</span>
+<p class="font-label-md text-label-md text-on-surface-variant">Component rendered here</p>
+</div>
+</div>
+</div>
+</aside>
+</main>
+</div>
+<script>
+        // Simple script to toggle popover for visual demonstration
+        const btn = document.getElementById('agent-switcher-btn');
+        const popover = document.getElementById('agent-popover');
+        const overlay = document.getElementById('dropdown-overlay');
+
+        // Initially show it as requested by prompt
+        popover.classList.remove('hidden');
+        overlay.classList.remove('hidden');
+        overlay.classList.add('opacity-100');
+        
+        // Setup toggle behavior
+        btn.addEventListener('click', () => {
+            const isHidden = popover.classList.contains('hidden');
+            if (isHidden) {
+                popover.classList.remove('hidden');
+                overlay.classList.remove('hidden');
+                // Small delay to allow display:block to apply before transition
+                setTimeout(() => overlay.classList.add('opacity-100'), 10);
+            } else {
+                popover.classList.add('hidden');
+                overlay.classList.remove('opacity-100');
+                setTimeout(() => overlay.classList.add('hidden'), 300);
+            }
+        });
+
+        overlay.addEventListener('click', () => {
+            popover.classList.add('hidden');
+            overlay.classList.remove('opacity-100');
+            setTimeout(() => overlay.classList.add('hidden'), 300);
+        });
+    </script>
+
+
+</body></html>

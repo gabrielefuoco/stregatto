@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="title">Antigravity IDE</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="/canvas/assets/css/themes.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      // Load saved theme
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme) {
+          document.documentElement.setAttribute('data-theme', savedTheme);
+      }
+      
+      tailwind.config = {
+        darkMode: ['class', '[data-theme="dark"]'],
+        theme: {
+          extend: {
+            colors: {
+              border: 'var(--bg-border)',
+            }
+          }
+        }
+      }
+    </script>
+
+    <!-- Icons (Lucide) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Marked.js & DOMPurify -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.8/purify.min.js"></script>
+</head>
+<body class="h-screen flex overflow-hidden text-[var(--text-primary)]" style="background-color: var(--bg-primary);">
+    
+    <!-- Activity Bar (Sidebar Sinistra) -->
+    <aside class="w-16 flex-shrink-0 flex flex-col items-center py-4 gap-6" style="background-color: var(--bg-secondary);">
+        
+        <!-- Nav Icons -->
+        <nav class="flex flex-col gap-4 w-full">
+            <button id="btn-global-sidebar-toggle" class="w-full flex justify-center py-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors relative group mb-2">
+                <i data-lucide="sidebar"></i>
+                <div class="absolute left-full ml-2 px-2 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none z-50 whitespace-nowrap">Toggle Sidebar</div>
+            </button>
+            
+            <a href="#chat" class="nav-link w-full flex justify-center py-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors relative group">
+                <i data-lucide="message-square"></i>
+                <div class="absolute left-full ml-2 px-2 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none z-50 whitespace-nowrap">Chat</div>
+            </a>
+            
+        </nav>
+        <div class="flex-grow"></div>
+        <!-- Nav Icons (Bottom) -->
+        <nav class="flex flex-col gap-4 w-full mb-4">
+            <a href="#plugins" class="nav-link w-full flex justify-center py-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors relative group">
+                <i data-lucide="blocks"></i>
+                <div class="absolute left-full ml-2 px-2 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none z-50 whitespace-nowrap">Plugins</div>
+            </a>
+
+            <a href="#settings" class="nav-link w-full flex justify-center py-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors relative group">
+                <i data-lucide="settings"></i>
+                <div class="absolute left-full ml-2 px-2 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none z-50 whitespace-nowrap">Settings</div>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main id="app-container" class="flex-1 flex overflow-hidden relative">
+        <!-- Le viste verranno caricate dinamicamente qui -->
+    </main>
+
+    <!-- Moduli JS (ESM) -->
+    <script type="module" src="/canvas/assets/js/router.js"></script>
+    <script>
+      // Initialize Lucide icons
+      lucide.createIcons();
+    </script>
+</body>
+</html>

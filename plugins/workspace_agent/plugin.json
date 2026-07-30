@@ -1,0 +1,12 @@
+{
+    "name": "Workspace Agent",
+    "version": "1.0.0",
+    "description": "A simple assistant that performs non-destructive tasks, like reading files in the file system.",
+    "author_name": "Antigravity",
+    "author_url": "",
+    "plugin_url": "",
+    "tags": "workspace, agent, read-only",
+    "thumb": "",
+    "min_cat_version": "2.0.0",
+    "max_cat_version": "Unknown"
+}
