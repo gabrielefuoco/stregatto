@@ -4,15 +4,14 @@ from mcp_client.config import MCPServer
 class FetchMCPDirective(MCPDirective):
     slug = "fetch"
     name = "Fetch MCP"
-    description = "Provides tools to fetch and read raw HTML from URLs, converting them to clean Markdown."
+    description = "Download ed estrazione di contenuti da URL web via HTTP."
 
     async def _composed_servers(self):
-        """Returns the dynamically configured MCP Server for Fetch."""
-        
         return [
             MCPServer(
                 name="fetch",
-                command="npx",
-                args=["-y", "mcp-server-fetch-typescript"]
+                description=self.description,
+                command="uvx",
+                args=["--with", "mcp==1.0.0", "mcp-server-fetch", "--ignore-robots-txt"]
             )
         ]

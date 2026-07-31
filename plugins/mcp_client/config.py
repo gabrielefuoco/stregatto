@@ -1,12 +1,5 @@
 """
 MCP server configuration for the mcp_client plugin.
-
-Core holds no MCP config type — all transport/connection plumbing lives here. An
-`MCPServer` is the plugin's own config shape; it converts to a fastmcp
-`RemoteMCPServer` and, from there, to a stateless `Client`.
-
-Auth: only `none` and `apikey` (bearer token) are supported. `oauth2` is rejected
-with a clear error until a later change adds it.
 """
 
 from typing import Any, List, Literal, Optional
@@ -24,6 +17,7 @@ class MCPServer(BaseModel):
     """A single MCP server the Cat connects to as a stateless client."""
 
     name: str = Field(description="Short label; namespaces this server's tools.")
+    description: Optional[str] = Field(default=None, description="Human-readable description of what this MCP server provides.")
     
     # Remote/HTTP config
     url: Optional[str] = Field(default=None, description="The server's MCP endpoint URL.")
@@ -38,18 +32,16 @@ class MCPServer(BaseModel):
     args: List[str] = Field(default_factory=list, description="Arguments for the stdio command.")
 
     def to_remote(self) -> Any:
-        """Convert to a fastmcp RemoteMCPServer or StdioMCPServer.
-
-        Raises ValueError for the unsupported `oauth2` mode so a misconfiguration
-        fails loudly instead of silently connecting without auth.
-        """
+        """Convert to a fastmcp RemoteMCPServer or StdioMCPServer."""
         if self.command:
             import shutil
             import os
             from dotenv import load_dotenv
             load_dotenv()
+            env = dict(os.environ)
+            env["PYTHONUTF8"] = "1"  # Force UTF-8 for Python MCP servers to avoid UnicodeDecodeError
             cmd = shutil.which(self.command) or self.command
-            return StdioMCPServer(command=cmd, args=self.args, env=dict(os.environ), keep_alive=True)
+            return StdioMCPServer(command=cmd, args=self.args, env=env, keep_alive=True)
             
         if not self.url:
             raise ValueError(f"MCP server '{self.name}' must define either 'url' or 'command'.")
@@ -72,12 +64,7 @@ class MCPServer(BaseModel):
 
 
 def build_client(server: MCPServer) -> Client:
-    """A fresh, stateless fastmcp Client for one server.
-
-    Statelessness by construction: a new Client per use, no pool, no cached
-    session. Callers open it with `async with` for the duration of a single
-    request and let it close.
-    """
+    """A fresh, stateless fastmcp Client for one server."""
     return Client(server.to_remote().to_transport())
 
 

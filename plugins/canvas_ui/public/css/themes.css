@@ -1,86 +1,182 @@
-/* themes.css */
-@import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;500;600;700&display=swap');
+/* themes.css - Soft Neo-Brutalist Design System */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Work+Sans:wght@400;500;600&display=swap');
 
 :root {
-  /* Default fonts */
-  --font-base: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  --font-serif: 'Georgia', 'Cambria', 'Times New Roman', serif;
+    --font-headline: 'Space Grotesk', sans-serif;
+    --font-body: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+    
+    /* Neo-Brutalist Tokens */
+    --color-surface: #f9f9f9;
+    --color-surface-container: #eeeeee;
+    --color-surface-lowest: #ffffff;
+    --color-on-surface: #1a1c1c;
+    --color-primary: #ff5f1f;
+    --color-primary-container: #ff5f1f;
+    --color-cream: #faf9f6;
+    --color-border: #1a1c1c;
 }
 
-/* LIGHT THEME */
-:root[data-theme="light"] {
-  --bg-primary: #fdfdfc;
-  --bg-secondary: #f4f4f5;
-  --bg-canvas: #f9f9f8;
-  --bg-border: #e4e4e7;
-  
-  --text-primary: #1e1b18;
-  --text-secondary: #71717a;
-  
-  --accent-color: #d97757; /* Claude Rust */
-  --accent-hover: #c26144;
-  
-  --msg-user: #f4f4f5;
-  --msg-agent: transparent;
-}
-
-/* DARK THEME */
-:root[data-theme="dark"] {
-  --bg-primary: #151414;
-  --bg-secondary: #1f1e1e;
-  --bg-canvas: #0e0d0d;
-  --bg-border: #2d2d2d;
-  
-  --text-primary: #e6e4e2;
-  --text-secondary: #858585;
-  
-  --accent-color: #d97757;
-  --accent-hover: #e2896c;
-  
-  --msg-user: #27272a;
-  --msg-agent: transparent;
-}
-
-/* Apply Base Settings */
 body {
-  font-family: var(--font-base);
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  transition: background-color 0.2s ease, color 0.2s ease;
+    font-family: var(--font-body);
+    background-color: var(--color-surface-container);
+    color: var(--color-on-surface);
+    margin: 0;
+    padding: 0;
 }
 
-/* Scrollbar styling for modern look */
+/* Blueprint Pattern Background with Delicate Orange Cursor Glow */
+.bg-blueprint {
+    position: relative;
+    background-color: #f9f9f9;
+    background-image: radial-gradient(rgba(26, 28, 28, 0.18) 1.1px, transparent 1.1px);
+    background-size: 16px 16px;
+    background-position: 0 0;
+}
+
+.bg-blueprint::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: radial-gradient(circle 190px at var(--mouse-x, -500px) var(--mouse-y, -500px), rgba(255, 95, 31, 0.85) 0%, rgba(255, 95, 31, 0.3) 40%, transparent 75%);
+    mask-image: radial-gradient(#000 1.1px, transparent 1.1px);
+    -webkit-mask-image: radial-gradient(#000 1.1px, transparent 1.1px);
+    mask-size: 16px 16px;
+    -webkit-mask-size: 16px 16px;
+    mask-position: 0 0;
+    -webkit-mask-position: 0 0;
+    transition: opacity 0.3s ease;
+}
+
+/* Neo-Brutalist Hard Shadows & Offsets */
+.shadow-hard {
+    box-shadow: 4px 4px 0px 0px #1a1c1c;
+}
+
+.shadow-hard-sm {
+    box-shadow: 2px 2px 0px 0px #1a1c1c;
+}
+
+.shadow-hard-hover {
+    transition: all 0.15s ease;
+}
+
+.shadow-hard-hover:hover {
+    box-shadow: 4px 4px 0px 0px #1a1c1c;
+    transform: translate(-2px, -2px);
+}
+
+.shadow-hard-active:active {
+    box-shadow: 0px 0px 0px 0px #1a1c1c;
+    transform: translate(2px, 2px);
+}
+
+/* Sidebar Transitions & State Classes */
+.sidebar-expanded {
+    width: 16rem;
+}
+
+.sidebar-collapsed {
+    width: 4.5rem;
+}
+
+.sidebar-transition {
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.artifacts-expanded {
+    width: 420px;
+}
+
+.artifacts-collapsed {
+    width: 0px;
+    border-left-width: 0px !important;
+    overflow: hidden;
+}
+
+/* Neo-Brutalist Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+    width: 8px;
+    height: 8px;
 }
+
 ::-webkit-scrollbar-track {
-  background: var(--bg-primary); 
+    background: #f9f9f9; 
+    border-left: 2px solid #1a1c1c;
 }
+
 ::-webkit-scrollbar-thumb {
-  background: var(--bg-border); 
-  border-radius: 4px;
+    background: #1a1c1c; 
+    border-radius: 0;
 }
+
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-secondary); 
+    background: #ff5f1f;
 }
 
-/* Typography Overrides */
+/* Markdown Styling Overrides */
 .markdown-body {
-  color: var(--text-primary) !important;
-  font-family: var(--font-base) !important;
-}
-.markdown-body pre {
-  background-color: var(--bg-secondary) !important;
-  border: 1px solid var(--bg-border);
-}
-.markdown-body code {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
-  background-color: var(--bg-secondary);
-  padding: 0.1em 0.3em;
-  border-radius: 3px;
+    font-family: var(--font-body) !important;
+    color: #1a1c1c !important;
+    font-weight: 500 !important;
 }
 
-.cm-editor { height: 100%; }
-.cm-scroller { overflow: auto; }
+.markdown-body p, .markdown-body li {
+    font-size: 0.875rem !important;
+    line-height: 1.625 !important;
+    font-weight: 500 !important;
+    margin-bottom: 0.75rem;
+}
+
+.markdown-body pre {
+    background-color: #1a1c1c !important;
+    color: #ffffff !important;
+    border: 2px solid #1a1c1c !important;
+    border-radius: 0px !important;
+    padding: 1rem !important;
+    box-shadow: 3px 3px 0px 0px #ff5f1f;
+}
+
+.markdown-body code {
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace !important;
+}
+
+.markdown-body p {
+    margin-bottom: 0.75rem;
+    line-height: 1.6;
+}
+
+.markdown-body ul, .markdown-body ol {
+    padding-left: 1.5rem;
+    margin-bottom: 0.75rem;
+}
+
+/* Delicate Timeline Styling for Agent Responses */
+.timeline-line {
+    position: absolute;
+    left: 11px;
+    top: 32px;
+    bottom: 16px;
+    width: 2px;
+    background-color: rgba(26, 28, 28, 0.15);
+}
+
+.timeline-dot {
+    position: absolute;
+    left: -33px;
+    top: 16px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #1a1c1c;
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 0 1px rgba(26, 28, 28, 0.15);
+    z-index: 10;
+}
+
+.timeline-dot-active {
+    background-color: #ff5f1f;
+    border-color: #ffffff;
+}
 

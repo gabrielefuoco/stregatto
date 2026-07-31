@@ -1,4 +1,4 @@
-// api.js
+// api.js - Cheshire Cat REST & SSE API Helper
 const API_BASE = '';
 
 export class CatAPI {
@@ -25,11 +25,27 @@ export class CatAPI {
     // --- CHATS ---
     static async getChats(search = '') {
         const url = search ? `/chats?search=${encodeURIComponent(search)}` : '/chats';
-        return this.fetch(url);
+        const res = await this.fetch(url);
+        // /chats returns Page[ChatSelect] { items: [...], cursor: "" }
+        if (res && Array.isArray(res.items)) {
+            return res.items;
+        }
+        return Array.isArray(res) ? res : [];
     }
 
     static async getChat(chatId) {
         return this.fetch(`/chats/${chatId}`);
+    }
+
+    static async createChat(name = "Nuova Chat") {
+        return this.fetch('/chats', { 
+            method: 'POST',
+            body: JSON.stringify({ name, messages: [], context: {} })
+        });
+    }
+
+    static async deleteChat(chatId) {
+        return this.fetch(`/chats/${chatId}`, { method: 'DELETE' });
     }
 
     static async uploadFile(file) {
@@ -41,7 +57,7 @@ export class CatAPI {
             const response = await fetch(url, {
                 method: 'POST',
                 credentials: 'include',
-                body: formData // No Content-Type, fetch sets it automatically with boundary for FormData
+                body: formData
             });
             if (!response.ok) {
                 const text = await response.text();
@@ -52,10 +68,6 @@ export class CatAPI {
             console.error("Upload failed:", error);
             throw error;
         }
-    }
-
-    static async createChat() {
-        return this.fetch('/chats', { method: 'POST' });
     }
     
     // Send a message via REST (no streaming)
@@ -77,13 +89,19 @@ export class CatAPI {
         const url = `${API_BASE}/agents/${agentSlug}/message`;
         const headers = { 'Content-Type': 'application/json' };
         
+        const messages = Array.isArray(messagesPayload)
+            ? messagesPayload
+            : (typeof messagesPayload === 'string'
+                ? [{ role: 'user', content: [{ type: 'text', text: messagesPayload }] }]
+                : [messagesPayload]);
+
         try {
             const response = await fetch(url, {
                 method: 'POST',
                 headers,
                 credentials: 'include',
                 body: JSON.stringify({
-                    messages: Array.isArray(messagesPayload) ? messagesPayload : [{ role: 'user', content: [{ type: "text", text: messagesPayload }] }],
+                    messages: messages,
                     stream: true
                 })
             });
@@ -104,7 +122,6 @@ export class CatAPI {
                 buffer += decoder.decode(value, { stream: true });
                 const lines = buffer.split("\n");
                 
-                // Keep the last (possibly partial) line in the buffer
                 buffer = lines[lines.length - 1];
 
                 for (let i = 0; i < lines.length - 1; i++) {
@@ -112,7 +129,6 @@ export class CatAPI {
                     if (cleaned) {
                         try {
                             const event = JSON.parse(cleaned);
-                            console.log("[api.js] Parsed SSE event:", event.type, event);
                             onEvent(event);
                         } catch (e) {
                             console.error("[api.js] Error parsing SSE JSON:", e, cleaned);
@@ -120,7 +136,7 @@ export class CatAPI {
                     }
                 }
             }
-            // Flush any remaining buffer
+            
             if (buffer.trim()) {
                 let cleaned = buffer.replace(/^(data:|event:)\s*/gm, "").trim();
                 if (cleaned) {
@@ -137,12 +153,49 @@ export class CatAPI {
     
     // --- AGENTS ---
     static async getAgents() {
-        return this.fetch('/agents');
+        const res = await this.fetch('/agents');
+        return Array.isArray(res) ? res : (res?.agents || []);
+    }
+    
+    // --- MODELS ---
+    static async getModels() {
+        try {
+            const settingsRes = await this.getSettings();
+            const settings = Array.isArray(settingsRes) ? settingsRes : (settingsRes?.settings || []);
+            
+            for (const setting of settings) {
+                const schemaProps = setting.schema?.properties || {};
+                if (schemaProps.default_llm) {
+                    const propSchema = schemaProps.default_llm;
+                    const enums = propSchema.enum || (propSchema.anyOf && propSchema.anyOf.find(a => a.enum)?.enum);
+                    if (Array.isArray(enums) && enums.length > 0) {
+                        return enums.map(modelId => ({
+                            id: modelId,
+                            name: modelId
+                        }));
+                    }
+                }
+            }
+        } catch (e) {
+            console.warn("Could not fetch models from Core Settings:", e);
+        }
+
+        // Fallback if settings query fails
+        try {
+            const res = await this.fetch('/llms');
+            if (Array.isArray(res) && res.length > 0) return res;
+        } catch (e) {}
+
+        return [
+            { id: "gpt-4o", name: "GPT-4o" },
+            { id: "gpt-4o-mini", name: "GPT-4o Mini" }
+        ];
     }
     
     // --- SETTINGS ---
     static async getSettings() {
-        return this.fetch('/settings');
+        const res = await this.fetch('/settings');
+        return Array.isArray(res) ? res : (res?.settings || []);
     }
 
     static async getSetting(settingId) {
@@ -158,7 +211,8 @@ export class CatAPI {
 
     // --- PLUGINS ---
     static async getPlugins() {
-        return this.fetch('/plugins');
+        const res = await this.fetch('/plugins');
+        return Array.isArray(res) ? res : (res?.installed || []);
     }
 
     static async togglePlugin(pluginId) {

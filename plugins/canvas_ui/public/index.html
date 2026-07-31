@@ -1,84 +1,188 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="it" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="title">Antigravity IDE</title>
+    <title>Stregatto - AI Assistant Studio</title>
     
-    <!-- CSS -->
+    <!-- Fonts & Material Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    
+    <!-- Custom Theme & Utility CSS -->
     <link rel="stylesheet" href="/canvas/assets/css/themes.css">
     
     <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      // Load saved theme
-      const savedTheme = localStorage.getItem('theme');
-      if (savedTheme) {
-          document.documentElement.setAttribute('data-theme', savedTheme);
-      }
-      
-      tailwind.config = {
-        darkMode: ['class', '[data-theme="dark"]'],
-        theme: {
-          extend: {
-            colors: {
-              border: 'var(--bg-border)',
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-container": "#eeeeee",
+                        "on-primary-container": "#561700",
+                        "secondary-container": "#e2e2e2",
+                        "on-primary": "#ffffff",
+                        "secondary": "#5e5e5e",
+                        "surface-container-high": "#e8e8e8",
+                        "on-primary-fixed-variant": "#832700",
+                        "on-background": "#1a1c1c",
+                        "on-secondary": "#ffffff",
+                        "outline": "#8f7066",
+                        "tertiary-container": "#939494",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-bright": "#f9f9f9",
+                        "background": "#f9f9f9",
+                        "error": "#ba1a1a",
+                        "surface-tint": "#ab3600",
+                        "surface-container-highest": "#e2e2e2",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed-variant": "#474747",
+                        "surface-dim": "#dadada",
+                        "outline-variant": "#e3bfb3",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed": "#e2e2e2",
+                        "on-error": "#ffffff",
+                        "primary-fixed-dim": "#ffb59c",
+                        "on-tertiary-container": "#2b2d2d",
+                        "on-secondary-fixed": "#1b1b1b",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "tertiary-fixed": "#e2e2e2",
+                        "tertiary": "#5d5f5f",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "surface-container-low": "#f3f3f4",
+                        "surface-variant": "#e2e2e2",
+                        "primary-fixed": "#ffdbcf",
+                        "secondary-fixed-dim": "#c6c6c6",
+                        "on-primary-fixed": "#390c00",
+                        "surface": "#f9f9f9",
+                        "on-surface-variant": "#5b4138",
+                        "on-surface": "#1a1c1c",
+                        "on-tertiary": "#ffffff",
+                        "primary": "#ab3600",
+                        "on-secondary-container": "#646464",
+                        "inverse-on-surface": "#f0f1f1",
+                        "inverse-primary": "#ffb59c",
+                        "primary-container": "#ff5f1f",
+                        "inverse-surface": "#2f3131",
+                        "cream-bg": "#faf9f6"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0px",
+                        "lg": "0px",
+                        "xl": "0px",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "xs": "4px",
+                        "sm": "8px",
+                        "md": "16px",
+                        "lg": "24px",
+                        "xl": "40px",
+                        "gutter": "20px",
+                        "margin-mobile": "16px",
+                        "margin-desktop": "64px",
+                        "unit": "4px"
+                    },
+                    fontFamily: {
+                        "headline-xl": ["Space Grotesk", "sans-serif"],
+                        "headline-lg": ["Space Grotesk", "sans-serif"],
+                        "headline-md": ["Space Grotesk", "sans-serif"],
+                        "label-md": ["Space Grotesk", "sans-serif"],
+                        "label-sm": ["Space Grotesk", "sans-serif"],
+                        "body-lg": ["Segoe UI", "sans-serif"],
+                        "body-md": ["Segoe UI", "sans-serif"],
+                        "sans": ["Segoe UI", "-apple-system", "BlinkMacSystemFont", "sans-serif"]
+                    },
+                    fontSize: {
+                        "headline-xl": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "600" }]
+                    }
+                }
             }
-          }
         }
-      }
     </script>
 
-    <!-- Icons (Lucide) -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-
-    <!-- Marked.js & DOMPurify -->
+    <!-- Marked.js & DOMPurify for Markdown rendering -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.8/purify.min.js"></script>
 </head>
-<body class="h-screen flex overflow-hidden text-[var(--text-primary)]" style="background-color: var(--bg-primary);">
-    
-    <!-- Activity Bar (Sidebar Sinistra) -->
-    <aside class="w-16 flex-shrink-0 flex flex-col items-center py-4 gap-6" style="background-color: var(--bg-secondary);">
-        
-        <!-- Nav Icons -->
-        <nav class="flex flex-col gap-4 w-full">
-            <button id="btn-global-sidebar-toggle" class="w-full flex justify-center py-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors relative group mb-2">
-                <i data-lucide="sidebar"></i>
-                <div class="absolute left-full ml-2 px-2 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none z-50 whitespace-nowrap">Toggle Sidebar</div>
+<body class="h-full bg-surface-container font-body-md text-on-surface flex flex-col md:flex-row overflow-hidden antialiased">
+    <!-- Desktop Left Sidebar -->
+    <aside id="left-sidebar" class="hidden md:flex flex-col h-screen sidebar-transition border-r-2 border-on-surface bg-surface-container-lowest p-md shrink-0 relative z-20 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1)] sidebar-expanded">
+        <!-- Header Profile / Brand -->
+        <div class="flex items-center justify-between mb-xl">
+            <div class="flex items-center gap-md p-xs overflow-hidden">
+                <div class="w-10 h-10 rounded-full border-2 border-on-surface overflow-hidden shrink-0 sidebar-text">
+                    <img class="w-full h-full object-cover" alt="Placeholder Avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDY1nKJGfA8BEHuj1QLsf_GbC2WWEk9V2eoXU4KbPrs4r9RBpyYWL6t8tNIVqfmP-G_jv5NsdlsnPXkvMZZPkP6kZczidliQTocWJf7OPHdNdaDtuVc42uKqn7e1arMnzkSVo_D3KWZrHvoHb-rrNrgjm2A8k19FIJDwMC3HtFy1U3N0Cn0KhjOlZa8aVuNrxueDh9ayBVElpxMTxmmLplpHo1b1z_hWnEqfUlA9Re8iOAT5XwxnP-8">
+                </div>
+                <div class="sidebar-text">
+                    <h2 class="font-headline-md text-[20px] font-bold text-on-surface leading-tight">AI Assistant</h2>
+                    <p class="font-label-sm text-label-sm text-on-surface-variant">Neo-Brutalist v1.0</p>
+                </div>
+            </div>
+            <button id="left-sidebar-toggle" class="p-xs text-on-surface hover:bg-surface-variant transition-colors border-2 border-transparent active:border-on-surface" title="Toggle Sidebar">
+                <span class="material-symbols-outlined">menu_open</span>
             </button>
-            
-            <a href="#chat" class="nav-link w-full flex justify-center py-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors relative group">
-                <i data-lucide="message-square"></i>
-                <div class="absolute left-full ml-2 px-2 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none z-50 whitespace-nowrap">Chat</div>
-            </a>
-            
-        </nav>
-        <div class="flex-grow"></div>
-        <!-- Nav Icons (Bottom) -->
-        <nav class="flex flex-col gap-4 w-full mb-4">
-            <a href="#plugins" class="nav-link w-full flex justify-center py-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors relative group">
-                <i data-lucide="blocks"></i>
-                <div class="absolute left-full ml-2 px-2 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none z-50 whitespace-nowrap">Plugins</div>
+        </div>
+
+        <!-- Navigation Links -->
+        <nav class="flex-1 flex flex-col gap-sm overflow-y-auto overflow-x-hidden pr-sm">
+            <a href="#chat" id="nav-btn-new-chat" class="flex items-center gap-md px-md py-sm w-full text-left bg-primary-container text-on-primary border-2 border-on-surface shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all" title="New Chat">
+                <span class="material-symbols-outlined shrink-0" style="font-variation-settings: 'FILL' 1;">add_comment</span>
+                <span class="font-headline-md text-[18px] sidebar-text">New Chat</span>
             </a>
 
-            <a href="#settings" class="nav-link w-full flex justify-center py-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors relative group">
-                <i data-lucide="settings"></i>
-                <div class="absolute left-full ml-2 px-2 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none z-50 whitespace-nowrap">Settings</div>
+            <a href="#agents" class="nav-link flex items-center gap-md px-md py-sm w-full text-left text-on-surface-variant hover:bg-surface-variant hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] border-2 border-transparent hover:border-on-surface hover:text-on-surface transition-all" title="Agents Gallery">
+                <span class="material-symbols-outlined shrink-0">library_books</span>
+                <span class="font-headline-md text-[18px] sidebar-text">Agents Gallery</span>
             </a>
+
+            <a href="#history" class="nav-link flex items-center gap-md px-md py-sm w-full text-left text-on-surface-variant hover:bg-surface-variant hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] border-2 border-transparent hover:border-on-surface hover:text-on-surface transition-all" title="History">
+                <span class="material-symbols-outlined shrink-0" style="font-variation-settings: 'FILL' 1;">history</span>
+                <span class="font-headline-md text-[18px] sidebar-text">History</span>
+            </a>
+
+            <!-- Dynamic Recent Chats Section -->
+            <div class="sidebar-text mt-md mb-xs px-md">
+                <span class="font-label-sm text-label-sm text-secondary uppercase tracking-widest">Recent</span>
+            </div>
+            <div id="recent-chats-list" class="flex flex-col gap-xs sidebar-text">
+                <span class="px-md py-xs text-xs text-secondary italic">Caricamento...</span>
+            </div>
+
+            <!-- Bottom Nav -->
+            <div class="mt-auto flex flex-col gap-sm">
+                <a href="#plugins" class="nav-link flex items-center gap-md px-md py-sm w-full text-left text-on-surface-variant hover:bg-surface-variant hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] border-2 border-transparent hover:border-on-surface hover:text-on-surface transition-all" title="Plugin">
+                    <span class="material-symbols-outlined shrink-0">extension</span>
+                    <span class="font-headline-md text-[18px] sidebar-text">Plugin</span>
+                </a>
+
+                <a href="#settings" class="nav-link flex items-center gap-md px-md py-sm w-full text-left text-on-surface-variant hover:bg-surface-variant hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] border-2 border-transparent hover:border-on-surface hover:text-on-surface transition-all" title="Settings">
+                    <span class="material-symbols-outlined shrink-0">settings</span>
+                    <span class="font-headline-md text-[18px] sidebar-text">Settings</span>
+                </a>
+            </div>
         </nav>
+        <div id="left-sidebar-resizer" class="hidden md:block absolute top-0 -right-1 w-2 h-full cursor-col-resize hover:bg-primary/50 active:bg-primary z-30 select-none"></div>
     </aside>
 
-    <!-- Main Content Area -->
-    <main id="app-container" class="flex-1 flex overflow-hidden relative">
-        <!-- Le viste verranno caricate dinamicamente qui -->
+    <!-- Main Content App Container -->
+    <main id="app-container" class="flex-1 flex flex-col relative min-w-0 bg-surface h-screen overflow-hidden">
+        <!-- Views loaded dynamically via router.js -->
     </main>
 
-    <!-- Moduli JS (ESM) -->
+    <!-- App Router -->
     <script type="module" src="/canvas/assets/js/router.js"></script>
-    <script>
-      // Initialize Lucide icons
-      lucide.createIcons();
-    </script>
 </body>
 </html>
+

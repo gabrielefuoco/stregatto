@@ -1,28 +1,27 @@
-const { CatAPI } = await import('./api.js?v=' + Date.now());
+// view_settings.js - Settings Manager View
+import { CatAPI } from './api.js';
 
 export async function renderSettingsView() {
     const container = document.createElement('div');
-    container.className = 'w-full h-full p-8 overflow-y-auto bg-[var(--bg-primary)]';
+    container.className = 'w-full h-full p-lg overflow-y-auto bg-surface relative z-10';
 
     container.innerHTML = `
-        <div class="max-w-3xl mx-auto relative">
-            <div class="absolute top-0 right-0 flex items-center gap-4">
-                <button id="btn-theme" class="p-2 rounded-full hover:bg-[var(--bg-secondary)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors" title="Cambia Tema">
-                    <i data-lucide="sun"></i>
-                </button>
-                <button id="btn-lang" class="font-bold text-sm p-2 rounded hover:bg-[var(--bg-secondary)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors" title="Cambia Lingua">
-                    IT
-                </button>
+        <!-- Blueprint Background Overlay -->
+        <div class="absolute inset-0 bg-blueprint z-0 pointer-events-none"></div>
+
+        <div class="relative z-10 max-w-4xl mx-auto py-md">
+            <div class="mb-xl border-b-2 border-on-surface pb-md">
+                <h1 class="font-headline-xl text-headline-xl text-on-surface mb-xs flex items-center gap-sm">
+                    <span class="material-symbols-outlined text-primary text-4xl">settings</span> Impostazioni Stregatto
+                </h1>
+                <p class="font-body-lg text-body-lg text-secondary">
+                    Configura i parametri di sistema, il modello LLM e i servizi integrati.
+                </p>
             </div>
-            <h1 class="text-2xl font-bold mb-2 flex items-center gap-2">
-                <i data-lucide="settings" class="w-6 h-6 text-[var(--accent-color)]"></i> Settings
-            </h1>
-            <p class="text-[var(--text-secondary)] mb-8">Configura il modello linguistico e i componenti di sistema.</p>
             
-            <div id="settings-list" class="flex flex-col gap-6">
-                <div class="py-12 text-center text-[var(--text-secondary)]">
-                    <i data-lucide="loader-2" class="w-8 h-8 animate-spin mx-auto mb-2"></i>
-                    Caricamento impostazioni...
+            <div id="settings-list" class="flex flex-col gap-lg">
+                <div class="p-xl text-center font-label-md text-secondary border-2 border-on-surface bg-surface-container-lowest shadow-hard">
+                    Caricamento impostazioni in corso...
                 </div>
             </div>
         </div>
@@ -30,16 +29,6 @@ export async function renderSettingsView() {
 
     setTimeout(() => {
         loadSettings(container);
-        
-        const btnTheme = container.querySelector('#btn-theme');
-        if (btnTheme) {
-            btnTheme.addEventListener('click', () => {
-                const root = document.documentElement;
-                const newTheme = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-                root.setAttribute('data-theme', newTheme);
-                localStorage.setItem('theme', newTheme);
-            });
-        }
     }, 0);
     return container;
 }
@@ -48,31 +37,38 @@ async function loadSettings(container) {
     const list = container.querySelector('#settings-list');
     try {
         const response = await CatAPI.getSettings();
-        const settings = response.settings || response; 
+        const settings = response.settings || (Array.isArray(response) ? response : []); 
         
         list.innerHTML = '';
         
         if (!settings || settings.length === 0) {
-            list.innerHTML = '<p class="text-center py-8">Nessuna impostazione trovata.</p>';
+            list.innerHTML = `
+                <div class="p-xl text-center border-2 border-on-surface bg-surface-container-lowest shadow-hard">
+                    <span class="material-symbols-outlined text-4xl text-secondary mb-xs">settings_suggest</span>
+                    <p class="font-headline-md font-bold text-on-surface">Nessuna impostazione trovata</p>
+                </div>
+            `;
             return;
         }
 
         settings.forEach(setting => {
             const card = document.createElement('div');
-            card.className = 'border border-border bg-[var(--bg-secondary)] rounded-xl p-6 shadow-sm';
+            card.className = 'border-2 border-on-surface bg-surface-container-lowest p-lg shadow-hard flex flex-col gap-md';
             
             let html = `
-                <div class="mb-4">
-                    <h3 class="font-bold text-lg">${setting.name}</h3>
-                    <p class="text-xs text-[var(--text-secondary)] font-mono mt-1">ID: ${setting.slug}</p>
+                <div class="border-b-2 border-on-surface pb-sm flex justify-between items-start">
+                    <div>
+                        <h3 class="font-headline-md text-headline-md font-bold text-on-surface">${setting.name || setting.slug || 'Impostazione'}</h3>
+                        <p class="font-label-sm text-label-sm text-secondary font-mono mt-xs">ID: ${setting.slug || setting.id}</p>
+                    </div>
+                    <span class="material-symbols-outlined text-secondary">tune</span>
                 </div>
-                <form class="flex flex-col gap-4" data-id="${setting.slug}">
+                <form class="flex flex-col gap-md" data-id="${setting.slug || setting.id}">
             `;
 
             const schemaProps = setting.schema?.properties || {};
             const values = setting.value || {};
             
-            // Generate fields based on schema if available, otherwise fallback to values
             const keys = Object.keys(schemaProps).length > 0 ? Object.keys(schemaProps) : Object.keys(values);
 
             for (const key of keys) {
@@ -83,42 +79,43 @@ async function loadSettings(container) {
                 const isBool = propSchema.type === 'boolean' || typeof val === 'boolean';
                 const enums = propSchema.enum || (propSchema.anyOf && propSchema.anyOf.find(a => a.enum)?.enum);
 
-                html += `<div class="flex flex-col gap-1">`;
+                html += `<div class="flex flex-col gap-xs">`;
                 
                 if (isBool) {
                     html += `
-                        <label class="flex items-center gap-2 text-sm font-semibold cursor-pointer">
-                            <input type="checkbox" name="${key}" ${val ? 'checked' : ''} class="w-4 h-4 rounded bg-[var(--bg-primary)] border-border text-[var(--accent-color)] focus:ring-[var(--accent-color)]" />
-                            ${labelText}
+                        <label class="flex items-center gap-sm font-label-md text-label-md cursor-pointer text-on-surface">
+                            <input type="checkbox" name="${key}" ${val ? 'checked' : ''} 
+                                   class="w-5 h-5 border-2 border-on-surface bg-surface-container text-primary focus:ring-0 rounded-none cursor-pointer" />
+                            <span>${labelText}</span>
                         </label>
                     `;
                 } else if (enums) {
                     html += `
-                        <label class="text-sm font-semibold capitalize">${labelText}</label>
-                        <select name="${key}" class="bg-[var(--bg-primary)] border border-border rounded-lg p-2 focus:outline-none focus:border-[var(--accent-color)]">
+                        <label class="font-label-md text-label-md font-bold capitalize text-on-surface">${labelText}</label>
+                        <select name="${key}" class="bg-surface-container border-2 border-on-surface p-sm font-body-md text-on-surface focus:outline-none focus:border-primary">
                             ${enums.map(opt => `<option value="${opt}" ${opt === val ? 'selected' : ''}>${opt}</option>`).join('')}
                         </select>
                     `;
                 } else {
                     const inputType = (propSchema.type === 'integer' || propSchema.type === 'number' || typeof val === 'number') ? 'number' : (key.includes('password') || key.includes('key') ? 'password' : 'text');
                     html += `
-                        <label class="text-sm font-semibold capitalize">${labelText}</label>
+                        <label class="font-label-md text-label-md font-bold capitalize text-on-surface">${labelText}</label>
                         <input type="${inputType}" 
                                name="${key}" 
                                value="${val === null ? '' : val}" 
-                               class="bg-[var(--bg-primary)] border border-border rounded-lg p-2 focus:outline-none focus:border-[var(--accent-color)]" />
+                               class="bg-surface-container border-2 border-on-surface p-sm font-body-md text-on-surface focus:outline-none focus:border-primary" />
                     `;
                 }
                 
                 if (propSchema.description) {
-                    html += `<p class="text-xs text-[var(--text-secondary)]">${propSchema.description}</p>`;
+                    html += `<p class="font-label-sm text-label-sm text-secondary">${propSchema.description}</p>`;
                 }
                 html += `</div>`;
             }
 
             html += `
-                    <div class="mt-4 flex justify-end">
-                        <button type="submit" class="px-4 py-2 rounded-lg text-white text-sm font-semibold hover:opacity-90 transition-opacity" style="background-color: var(--accent-color);">
+                    <div class="mt-sm flex justify-end">
+                        <button type="submit" class="px-lg py-sm bg-primary-container text-on-primary border-2 border-on-surface font-label-md text-label-md font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all">
                             Salva Modifiche
                         </button>
                     </div>
@@ -151,7 +148,7 @@ async function loadSettings(container) {
                 btn.disabled = true;
 
                 try {
-                    await CatAPI.updateSetting(setting.id, payload);
+                    await CatAPI.updateSetting(setting.id || setting.slug, payload);
                     btn.textContent = 'Salvato!';
                     setTimeout(() => { btn.textContent = oldText; btn.disabled = false; }, 2000);
                 } catch (err) {
@@ -166,8 +163,10 @@ async function loadSettings(container) {
         });
 
     } catch (error) {
-        list.innerHTML = `<div class="text-red-500 bg-red-500/10 p-4 rounded-xl border border-red-500/20">
-            Errore nel caricamento dei settings: ${error.message}
-        </div>`;
+        list.innerHTML = `
+            <div class="border-2 border-on-surface bg-error-container text-on-error-container p-md shadow-hard font-mono text-sm">
+                <strong>Errore caricamento impostazioni:</strong> ${error.message}
+            </div>
+        `;
     }
 }

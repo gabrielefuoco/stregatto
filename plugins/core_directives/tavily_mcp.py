@@ -4,16 +4,14 @@ from mcp_client.config import MCPServer
 class TavilyMCPDirective(MCPDirective):
     slug = "tavily"
     name = "Tavily MCP"
-    description = "Provides tools for AI-optimized web search and extraction via Tavily."
+    description = "Motore di ricerca web in tempo reale per notizie, informazioni ed articoli online."
 
     async def _composed_servers(self):
-        """Returns the dynamically configured MCP Server for Tavily."""
-        
-        # The TAVILY_API_KEY is loaded from the .env file automatically by the framework.
         return [
             MCPServer(
                 name="tavily",
+                description=self.description,
                 command="npx",
-                args=["-y", "mcp-tavily-search"]
+                args=["-y", "tavily-mcp"]
             )
         ]

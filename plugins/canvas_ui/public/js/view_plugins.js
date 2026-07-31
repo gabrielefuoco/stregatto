@@ -1,20 +1,27 @@
-const { CatAPI } = await import('./api.js?v=' + Date.now());
+// view_plugins.js - Plugins Manager View
+import { CatAPI } from './api.js';
 
 export async function renderPluginsView() {
     const container = document.createElement('div');
-    container.className = 'w-full h-full p-8 overflow-y-auto bg-[var(--bg-primary)]';
+    container.className = 'w-full h-full p-lg overflow-y-auto bg-surface relative z-10';
 
     container.innerHTML = `
-        <div class="max-w-4xl mx-auto">
-            <h1 class="text-2xl font-bold mb-2 flex items-center gap-2">
-                <i data-lucide="blocks" class="w-6 h-6 text-[var(--accent-color)]"></i> Plugins
-            </h1>
-            <p class="text-[var(--text-secondary)] mb-8">Gestisci i plugin del tuo Antigravity IDE.</p>
+        <!-- Blueprint Overlay -->
+        <div class="absolute inset-0 bg-blueprint z-0 pointer-events-none"></div>
+
+        <div class="relative z-10 max-w-4xl mx-auto py-md">
+            <div class="mb-xl border-b-2 border-on-surface pb-md">
+                <h1 class="font-headline-xl text-headline-xl text-on-surface mb-xs flex items-center gap-sm">
+                    <span class="material-symbols-outlined text-primary text-4xl">extension</span> Plugin
+                </h1>
+                <p class="font-body-lg text-body-lg text-secondary">
+                    Gestisci i plugin attivi nel tuo framework Stregatto.
+                </p>
+            </div>
             
-            <div id="plugins-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="col-span-full py-12 text-center text-[var(--text-secondary)]">
-                    <i data-lucide="loader-2" class="w-8 h-8 animate-spin mx-auto mb-2"></i>
-                    Caricamento plugin...
+            <div id="plugins-grid" class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+                <div class="col-span-full py-xl text-center font-label-md text-secondary border-2 border-on-surface bg-surface-container-lowest shadow-hard">
+                    Caricamento plugin in corso...
                 </div>
             </div>
         </div>
@@ -38,25 +45,38 @@ async function loadPlugins(container) {
         grid.innerHTML = '';
         
         if (plugins.length === 0) {
-            grid.innerHTML = '<p class="col-span-full text-center py-8">Nessun plugin installato.</p>';
+            grid.innerHTML = `
+                <div class="col-span-full text-center py-xl border-2 border-on-surface bg-surface-container-lowest shadow-hard">
+                    <span class="material-symbols-outlined text-4xl text-secondary mb-xs">extension_off</span>
+                    <p class="font-headline-md text-headline-md font-bold text-on-surface">Nessun plugin installato</p>
+                </div>
+            `;
             return;
         }
 
         plugins.forEach(plugin => {
             const card = document.createElement('div');
-            card.className = 'border border-border bg-[var(--bg-secondary)] rounded-xl p-5 flex flex-col gap-3 shadow-sm hover:border-[var(--accent-color)] transition-colors relative';
+            card.className = 'border-2 border-on-surface bg-surface-container-lowest p-lg shadow-hard flex flex-col justify-between hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all relative';
             
+            const name = plugin.manifest?.name || plugin.name || plugin.id;
+            const desc = plugin.manifest?.description || plugin.description || 'Nessuna descrizione.';
+            const version = plugin.manifest?.version || plugin.version || '1.0.0';
+            const isActive = plugin.active !== undefined ? plugin.active : true;
+
             card.innerHTML = `
-                <div class="flex justify-between items-start">
-                    <h3 class="font-bold text-lg">${plugin.manifest?.name || plugin.id}</h3>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" class="sr-only peer" ${plugin.active ? 'checked' : ''} data-id="${plugin.id}">
-                        <div class="w-9 h-5 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[var(--accent-color)]"></div>
-                    </label>
+                <div>
+                    <div class="flex justify-between items-start mb-sm">
+                        <h3 class="font-headline-md text-headline-md font-bold text-on-surface">${name}</h3>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" class="sr-only peer" ${isActive ? 'checked' : ''} data-id="${plugin.id}">
+                            <div class="w-12 h-6 bg-surface-container border-2 border-on-surface peer-checked:bg-primary transition-all relative after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface after:border-2 after:border-on-surface after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-6 peer-checked:after:bg-on-primary"></div>
+                        </label>
+                    </div>
+                    <p class="font-body-md text-body-md text-secondary mb-md">${desc}</p>
                 </div>
-                <p class="text-sm text-[var(--text-secondary)]">${plugin.manifest?.description || 'Nessuna descrizione.'}</p>
-                <div class="mt-auto pt-4 flex gap-2 text-xs text-[var(--text-secondary)] font-mono">
-                    <span class="bg-[var(--bg-primary)] px-2 py-1 rounded">v${plugin.manifest?.version || '0.0.0'}</span>
+                <div class="pt-sm border-t-2 border-on-surface flex justify-between items-center text-label-sm font-label-sm">
+                    <span class="px-xs py-[2px] bg-surface-container border border-on-surface uppercase">v${version}</span>
+                    <span class="text-secondary font-mono">${plugin.id}</span>
                 </div>
             `;
             
@@ -70,7 +90,7 @@ async function loadPlugins(container) {
                 } catch (err) {
                     console.error("Errore nel toggle del plugin", err);
                     alert("Errore durante l'attivazione del plugin.");
-                    e.target.checked = !isChecked; // revert
+                    e.target.checked = !isChecked;
                 } finally {
                     toggle.disabled = false;
                 }
@@ -80,8 +100,10 @@ async function loadPlugins(container) {
         });
 
     } catch (error) {
-        grid.innerHTML = `<div class="col-span-full text-red-500 bg-red-500/10 p-4 rounded-xl border border-red-500/20">
-            Errore nel caricamento dei plugin: ${error.message}
-        </div>`;
+        grid.innerHTML = `
+            <div class="col-span-full border-2 border-on-surface bg-error-container text-on-error-container p-md shadow-hard font-mono text-sm">
+                <strong>Errore caricamento plugin:</strong> ${error.message}
+            </div>
+        `;
     }
 }

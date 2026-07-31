@@ -1,20 +1,19 @@
+import os
 from mcp_client.directive import MCPDirective
 from mcp_client.config import MCPServer
 
 class FilesystemMCPDirective(MCPDirective):
     slug = "filesystem"
     name = "Filesystem MCP"
-    description = "Provides access to the local filesystem using standard MCP tools."
+    description = "Lettura, scrittura e navigazione dei file del file system locale."
 
     async def _composed_servers(self):
-        """Returns the dynamically configured MCP Server for the filesystem."""
-        
-        # Here we configure the stdio command. npx will fetch the package and run it.
-        # We restrict the filesystem root to the current project directory for safety.
+        root_dir = os.getcwd()
         return [
             MCPServer(
                 name="filesystem",
+                description=self.description,
                 command="npx",
-                args=["-y", "@modelcontextprotocol/server-filesystem", "C:/Users/gabri/APP/stregatto"]
+                args=["-y", "@modelcontextprotocol/server-filesystem", root_dir]
             )
         ]

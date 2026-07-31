@@ -1,111 +1,138 @@
-const { CatAPI } = await import('./api.js?v=' + Date.now());
+// view_chat.js - Main Chat Canvas & Artifacts View
+import { CatAPI } from './api.js';
 
 // CodeMirror imports (via esm.sh)
-import { EditorState, Compartment } from "https://esm.sh/@codemirror/state";
-import { EditorView, keymap } from "https://esm.sh/@codemirror/view";
-import { defaultKeymap } from "https://esm.sh/@codemirror/commands";
+import { EditorState } from "https://esm.sh/@codemirror/state";
+import { EditorView } from "https://esm.sh/@codemirror/view";
 import { javascript } from "https://esm.sh/@codemirror/lang-javascript";
 import { basicSetup } from "https://esm.sh/codemirror";
-import { oneDark } from "https://esm.sh/@codemirror/theme-one-dark";
 
 export async function renderChatView() {
     const container = document.createElement('div');
-    container.className = 'w-full h-full flex flex-col md:flex-row relative';
+    container.className = 'w-full h-full flex flex-col relative min-w-0 bg-surface overflow-hidden';
 
     container.innerHTML = `
-        <!-- History Sidebar -->
-        <section id="history-panel" class="hidden w-[320px] flex-col border-r border-border h-full bg-[var(--bg-secondary)] flex-shrink-0 shadow-sm z-20 relative">
-            <div id="resizer-history" class="w-1 cursor-col-resize absolute right-0 top-0 bottom-0 bg-transparent hover:bg-[var(--accent-color)] active:bg-[var(--accent-color)] transition-colors z-50"></div>
-            <div class="pt-6 pb-4 flex items-center justify-between px-4 relative">
-                <span class="font-semibold text-[var(--text-primary)] tracking-wide">Chats</span>
-                <button id="btn-new-chat" class="p-1.5 rounded-md hover:bg-black/5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors" title="New Chat">
-                    <i data-lucide="edit" class="w-4 h-4"></i>
-                </button>
-            </div>
-            <div class="px-4 pb-2">
-                <div class="relative flex items-center">
-                    <i data-lucide="search" class="w-4 h-4 absolute left-3 text-gray-400"></i>
-                    <input type="text" id="chat-search" class="w-full bg-[var(--bg-primary)] border border-border rounded-md pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-[var(--accent-color)] shadow-sm placeholder:text-gray-400" placeholder="Cerca...">
-                </div>
-            </div>
-            <div id="chats-list" class="flex-1 overflow-y-auto px-2 py-2 space-y-1 bg-transparent">
-                <div class="text-center text-xs text-gray-500 mt-4">Caricamento...</div>
-            </div>
-        </section>
+        <!-- Blueprint Background Overlay -->
+        <div class="absolute inset-0 bg-blueprint z-0 pointer-events-none"></div>
 
-        <!-- Chat Panel -->
-        <section id="chat-panel" class="flex-1 min-w-[300px] flex flex-col border-r border-border h-full bg-[var(--bg-primary)] relative">
-            
-            <button id="btn-open-canvas" class="hidden absolute top-4 right-4 z-10 p-2 rounded-xl bg-[var(--bg-primary)] border border-border shadow-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors hover:shadow-md" title="Apri Editor">
-                <i data-lucide="code" class="w-4 h-4"></i>
-            </button>
-
-            <!-- Messages Area -->
-            <div id="messages-container" class="flex-1 overflow-y-auto p-4 space-y-6">
-                <!-- Empty State -->
-                <div id="empty-state" class="h-full flex flex-col items-center justify-center text-center">
-                    <i data-lucide="sparkles" class="w-12 h-12 text-[var(--accent-color)] mb-4"></i>
-                    <h2 class="text-3xl text-[var(--text-primary)]" style="font-family: var(--font-serif);">Cosa possiamo affrontare insieme?</h2>
-                </div>
-            </div>
-
-            <!-- Input Area -->
-            <div class="p-4 bg-transparent flex justify-center pb-6">
-                <form id="chat-form" class="w-full max-w-3xl flex gap-2 bg-[var(--bg-secondary)] p-3 rounded-2xl border border-border shadow-sm hover:shadow focus-within:shadow focus-within:border-gray-400 dark:focus-within:border-gray-600 transition-all relative">
-                    <!-- Upload Dropzone Popover -->
-                    <div id="upload-popover" class="hidden absolute bottom-full left-0 mb-2 bg-[var(--bg-primary)] border border-border shadow-lg rounded-xl p-4 w-64 z-50">
-                        <label class="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-border rounded-lg cursor-pointer hover:bg-[var(--bg-secondary)] hover:border-[var(--accent-color)] transition-all">
-                            <i data-lucide="upload" class="w-6 h-6 text-[var(--text-secondary)] mb-2"></i>
-                            <span class="text-xs text-[var(--text-secondary)]">Seleziona o trascina</span>
-                            <input type="file" id="file-upload" class="hidden" multiple />
-                        </label>
-                        <div id="upload-status" class="hidden mt-2 text-xs text-center text-[var(--text-secondary)]">Caricamento...</div>
-                    </div>
-
-                    <button type="button" id="btn-upload" class="self-end p-2 rounded-xl text-[var(--text-secondary)] hover:bg-black/10 transition-colors" title="Allega file">
-                        <i data-lucide="plus" class="w-4 h-4"></i>
-                    </button>
-                    
-                    <div class="flex-1 flex flex-col justify-center min-h-[32px]">
-                        <div id="chat-attachments" class="flex flex-wrap gap-2 empty:hidden pt-1 pb-2"></div>
-                        <textarea 
-                            id="chat-input" 
-                            class="w-full bg-transparent border-none py-1 resize-none focus:outline-none max-h-48 text-[15px] leading-relaxed" 
-                            rows="1" 
-                            placeholder="Come posso aiutarti oggi?"></textarea>
-                    </div>
-
-                    <select id="agent-select" class="self-end mb-2 bg-transparent border-none font-medium text-xs text-[var(--text-secondary)] focus:outline-none cursor-pointer hover:text-[var(--text-primary)]">
+        <!-- TopAppBar (Desktop & Mobile) -->
+        <header class="flex justify-between items-center w-full px-lg py-sm bg-surface-container-lowest border-b-2 border-on-surface z-10 shrink-0">
+            <!-- Agent Selector Dropdown -->
+            <div class="flex items-center gap-xs">
+                <div class="relative flex items-center px-xs transition-colors border-2 border-transparent hover:bg-surface-variant active:border-on-surface">
+                    <select id="agent-select" class="bg-transparent border-none focus:ring-0 font-headline-md text-[20px] font-black text-on-surface tracking-tight cursor-pointer pr-8 appearance-none py-1" style="background-image: none !important;">
                         <option value="default">Default Agent</option>
                     </select>
-
-                    <button type="submit" class="self-end p-2 rounded-xl text-white transition-colors hover:bg-[var(--accent-hover)]" style="background-color: var(--accent-color);">
-                        <i data-lucide="arrow-up" class="w-4 h-4"></i>
-                    </button>
-                </form>
-            </div>
-        </section>
-
-        <!-- Canvas Panel -->
-        <section id="canvas-panel" class="hidden w-full md:w-1/2 lg:w-2/5 flex-col absolute md:relative h-full inset-0 z-10 bg-[var(--bg-canvas)] transition-transform duration-300 border-l border-border">
-            <div id="resizer-canvas" class="w-1 cursor-col-resize absolute left-0 top-0 bottom-0 bg-transparent hover:bg-[var(--accent-color)] active:bg-[var(--accent-color)] transition-colors z-50"></div>
-            <!-- Canvas Header -->
-            <div class="h-14 flex items-center justify-between px-4 border-b border-border bg-[var(--bg-secondary)] flex-shrink-0">
-                <span id="canvas-title" class="font-semibold flex items-center gap-2 text-sm truncate max-w-[250px]">
-                    <i data-lucide="code" class="w-4 h-4 flex-shrink-0"></i> Artifact
-                </span>
-                <div class="flex gap-2">
-                    <button id="btn-copy" class="text-xs flex items-center gap-1 px-2 py-1 rounded bg-[var(--bg-primary)] border border-border hover:bg-[var(--bg-border)]">
-                        <i data-lucide="copy" class="w-3 h-3"></i> Copy
-                    </button>
-                    <button id="btn-close-canvas" class="p-1 rounded hover:bg-black/10 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
-                        <i data-lucide="x" class="w-4 h-4"></i>
-                    </button>
+                    <span class="material-symbols-outlined pointer-events-none absolute right-2">expand_more</span>
                 </div>
             </div>
-            <!-- Editor -->
-            <div id="editor-host" class="flex-1 overflow-hidden"></div>
-        </section>
+
+            <!-- Navigation Links -->
+            <nav class="hidden md:flex gap-lg items-center">
+                <a href="#settings" class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-variant transition-colors px-sm py-xs border-b-2 border-transparent">
+                    Agent Settings
+                </a>
+                <a href="#settings" class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-variant transition-colors px-sm py-xs border-b-2 border-transparent">
+                    Knowledge
+                </a>
+            </nav>
+
+            <!-- Trailing Icons & Actions -->
+            <div class="flex items-center gap-sm">
+                <button id="right-sidebar-toggle" class="p-xs text-on-surface-variant hover:text-on-surface hover:bg-surface-variant transition-colors border-2 border-transparent active:border-on-surface" title="Toggle Artifacts Sidebar">
+                    <span class="material-symbols-outlined">data_object</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Body: Chat + Artifacts -->
+        <div class="flex-1 flex overflow-hidden relative z-10">
+            <!-- Chat Main Canvas -->
+            <div class="flex-1 flex flex-col relative min-w-0 h-full overflow-hidden">
+                <!-- Messages Area -->
+                <div id="messages-container" class="flex-1 overflow-y-auto p-lg space-y-md">
+                    <!-- Empty State / Welcome -->
+                    <div id="empty-state" class="h-full flex flex-col items-center justify-center text-center max-w-2xl mx-auto w-full py-xl">
+                        <div class="w-24 h-24 bg-surface-container-lowest border-2 border-on-surface shadow-hard flex items-center justify-center mb-xl">
+                            <span class="material-symbols-outlined text-primary-container text-5xl" style="font-variation-settings: 'FILL' 1;">forum</span>
+                        </div>
+                        <h1 class="font-headline-xl text-headline-xl text-on-surface mb-md">Cosa possiamo affrontare insieme?</h1>
+                        <p class="font-body-lg text-body-lg text-secondary max-w-lg border-2 border-on-surface bg-surface-container-lowest p-md shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                            Sono pronto ad aiutarti a scrivere codice, analizzare dati o redigere documenti con lo Stregatto.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Input Area -->
+                <div class="w-full max-w-4xl mx-auto px-lg pb-md pt-xs shrink-0">
+                    <form id="chat-form" class="relative flex items-end bg-surface-container-lowest border-2 border-on-surface shadow-[4px_4px_0px_0px_#ff5f1f] focus-within:shadow-[4px_4px_0px_0px_#1a1c1c] transition-all p-sm mb-xs">
+                        
+                        <!-- Upload File Button -->
+                        <input type="file" id="file-upload-input" class="hidden" />
+                        <button type="button" id="btn-upload" class="p-sm text-secondary hover:text-on-surface transition-colors flex items-center justify-center shrink-0" title="Allega file">
+                            <span class="material-symbols-outlined">attach_file</span>
+                        </button>
+
+                        <!-- Model Selector Dropdown -->
+                        <div class="relative flex items-center border-r-2 border-on-surface pr-xs mr-xs h-11 shrink-0 max-w-[180px]">
+                            <select id="model-select" class="bg-transparent border-none focus:ring-0 text-on-surface-variant hover:bg-surface-variant font-label-sm text-label-sm border-2 border-transparent cursor-pointer pr-4 truncate w-full">
+                                <option value="default">Caricamento modelli...</option>
+                            </select>
+                        </div>
+
+                        <!-- Textarea -->
+                        <textarea id="chat-input" 
+                                  class="w-full bg-transparent border-none focus:ring-0 resize-none max-h-48 min-h-[44px] py-sm px-xs font-body-md text-on-surface placeholder:font-label-md placeholder:text-secondary" 
+                                  placeholder="Scrivi un messaggio allo Stregatto..." 
+                                  rows="1"></textarea>
+
+                        <!-- Send Button -->
+                        <button type="submit" class="p-sm bg-primary-container text-on-primary border-2 border-on-surface shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all ml-xs flex items-center justify-center h-[44px] w-[44px] shrink-0" title="Invia">
+                            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">send</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Right Sidebar: Artifacts & Terminal -->
+            <aside id="right-sidebar" class="hidden xl:flex flex-col h-full sidebar-transition border-l-2 border-on-surface bg-cream-bg shrink-0 z-20 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1)] artifacts-collapsed relative">
+                <!-- Resizer Handle -->
+                <div id="right-sidebar-resizer" class="absolute top-0 -left-1 w-2 h-full cursor-col-resize hover:bg-primary/50 active:bg-primary z-30 select-none"></div>
+
+                <!-- Header -->
+                <div class="flex items-center justify-between p-md border-b-2 border-on-surface bg-tertiary-fixed whitespace-nowrap">
+                    <div class="flex items-center gap-sm">
+                        <span class="material-symbols-outlined text-on-surface">data_object</span>
+                        <h3 class="font-label-md text-label-md font-bold uppercase tracking-widest" id="canvas-title">Artifacts</h3>
+                    </div>
+                    <div class="flex gap-xs">
+                        <button id="btn-copy-code" class="p-xs border-2 border-transparent hover:border-on-surface hover:bg-surface transition-all flex items-center gap-1 font-label-sm text-label-sm" title="Copia Codice">
+                            <span class="material-symbols-outlined text-sm">copy_all</span> Copia
+                        </button>
+                        <button id="right-sidebar-close" class="p-xs border-2 border-transparent hover:border-on-surface hover:bg-surface transition-all">
+                            <span class="material-symbols-outlined text-sm">close</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Code Viewer Section -->
+                <div class="flex-1 flex flex-col overflow-hidden bg-cream-bg">
+                    <div id="editor-host" class="flex-1 overflow-auto bg-cream-bg text-on-surface font-mono text-sm relative border-b-2 border-on-surface"></div>
+                </div>
+
+                <!-- Terminal Section -->
+                <div class="h-1/3 border-t-2 border-on-surface bg-cream-bg flex flex-col">
+                    <div class="flex items-center justify-between px-md py-xs border-b-2 border-on-surface bg-surface-container">
+                        <span class="font-label-sm text-label-sm text-on-surface">Terminal</span>
+                        <span class="material-symbols-outlined text-on-surface text-sm">terminal</span>
+                    </div>
+                    <div id="terminal-output" class="p-md font-mono text-xs text-on-surface overflow-auto flex-1 bg-surface-container-lowest">
+                        <p>&gt; Stregatto Agent Ready</p>
+                        <p class="animate-pulse">_</p>
+                    </div>
+                </div>
+            </aside>
+        </div>
     `;
 
     setTimeout(() => initChatLogic(container), 0);
@@ -117,754 +144,825 @@ function initChatLogic(container) {
     const chatInput = container.querySelector('#chat-input');
     const messagesContainer = container.querySelector('#messages-container');
     const emptyState = container.querySelector('#empty-state');
-    const canvasPanel = container.querySelector('#canvas-panel');
-    const editorHost = container.querySelector('#editor-host');
-    const btnCloseCanvas = container.querySelector('#btn-close-canvas');
-    const btnCopy = container.querySelector('#btn-copy');
-    
-    // Sidebar elements
-    const historyPanel = container.querySelector('#history-panel');
-    const btnOpenCanvas = container.querySelector('#btn-open-canvas');
-    const chatsList = container.querySelector('#chats-list');
-    const searchInput = container.querySelector('#chat-search');
-    const btnNewChat = container.querySelector('#btn-new-chat');
     const agentSelect = container.querySelector('#agent-select');
-    
-    // Toggle Logic
-    function updateSidebarToggles() {
-        if (canvasPanel.classList.contains('hidden')) {
-            btnOpenCanvas.classList.remove('hidden');
-        } else {
-            btnOpenCanvas.classList.add('hidden');
-        }
-    }
+    const bentoPrompts = container.querySelectorAll('.bento-prompt');
+    const rightSidebar = container.querySelector('#right-sidebar');
+    const rightSidebarToggle = container.querySelector('#right-sidebar-toggle');
+    const rightSidebarClose = container.querySelector('#right-sidebar-close');
+    const editorHost = container.querySelector('#editor-host');
+    const terminalOutput = container.querySelector('#terminal-output');
+    const btnCopyCode = container.querySelector('#btn-copy-code');
+    const canvasTitle = container.querySelector('#canvas-title');
 
-    // Setup initial sidebar visibility based on screen width
-    if (window.innerWidth >= 1024) {
-        historyPanel.classList.remove('hidden');
-        historyPanel.classList.add('flex');
-    }
-    const savedHistoryWidth = localStorage.getItem('historyPanelWidth');
-    if (savedHistoryWidth) {
-        historyPanel.style.width = savedHistoryWidth;
-    }
-    const savedCanvasWidth = localStorage.getItem('canvasPanelWidth');
-    if (savedCanvasWidth) {
-        canvasPanel.style.width = savedCanvasWidth;
-    }
-    updateSidebarToggles();
-
-    if (btnOpenCanvas) btnOpenCanvas.addEventListener('click', () => {
-        canvasPanel.classList.remove('hidden');
-        canvasPanel.classList.add('flex');
-        updateSidebarToggles();
-    });
-
-    // Resize Logic
-    const resizerHistory = container.querySelector('#resizer-history');
-    let isResizingHistory = false;
-    if (resizerHistory) {
-        resizerHistory.addEventListener('mousedown', (e) => {
-            isResizingHistory = true;
-            document.body.style.cursor = 'col-resize';
-            e.preventDefault();
-        });
-    }
-
-    const resizerCanvas = container.querySelector('#resizer-canvas');
-    let isResizingCanvas = false;
-    if (resizerCanvas) {
-        resizerCanvas.addEventListener('mousedown', (e) => {
-            isResizingCanvas = true;
-            document.body.style.cursor = 'col-resize';
-            e.preventDefault();
-        });
-    }
-
-    document.addEventListener('mousemove', (e) => {
-        if (!isResizingHistory && !isResizingCanvas) return;
-        
-        e.preventDefault();
-
-        if (isResizingHistory) {
-            const historyRect = historyPanel.getBoundingClientRect();
-            let newWidth = e.clientX - historyRect.left;
-            if (newWidth < 200) newWidth = 200;
-            if (newWidth > 600) newWidth = 600;
-            historyPanel.style.width = newWidth + 'px';
-        }
-        
-        if (isResizingCanvas) {
-            const containerRect = container.getBoundingClientRect();
-            let newWidth = containerRect.right - e.clientX;
-            if (newWidth < 300) newWidth = 300;
-            if (newWidth > containerRect.width - 300) newWidth = containerRect.width - 300;
-            canvasPanel.style.width = newWidth + 'px';
-        }
-    });
-
-    document.addEventListener('mouseup', () => {
-        if (isResizingHistory || isResizingCanvas) {
-            if (isResizingHistory) {
-                localStorage.setItem('historyPanelWidth', historyPanel.style.width);
-            }
-            if (isResizingCanvas) {
-                localStorage.setItem('canvasPanelWidth', canvasPanel.style.width);
-            }
-            isResizingHistory = false;
-            isResizingCanvas = false;
-            document.body.style.cursor = 'default';
-        }
-    });
-    
-    // State
+    let currentMessages = [];
     let currentChatId = null;
     let currentChatName = "Nuova Chat";
-    let currentMessages = [];
-    let currentAttachments = []; // Array of uploaded files {url, mime_type}
+    
+    // Artifact parsing state
+    let artifactToolCalls = {}; 
 
     // CodeMirror Setup
-    let editorView = null;
-    const themeConfig = new Compartment();
-    const getTheme = () => document.documentElement.getAttribute('data-theme') === 'dark' ? oneDark : [];
-    
-    let state = EditorState.create({
-        doc: "// Code will appear here",
-        extensions: [basicSetup, keymap.of(defaultKeymap), javascript(), themeConfig.of(getTheme())]
-    });
-    editorView = new EditorView({ state, parent: editorHost });
-
-    // Sync CodeMirror theme with app theme
-    const observer = new MutationObserver(() => {
-        editorView.dispatch({
-            effects: themeConfig.reconfigure(getTheme())
-        });
-    });
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
-
-    // Load Agents
-    CatAPI.getAgents().then(agents => {
-        if (agents && agents.length > 0) {
-            const savedAgent = localStorage.getItem('selectedAgent') || 'default';
-            agentSelect.innerHTML = agents.map(a => `<option value="${a.slug}" class="bg-[var(--bg-primary)] text-[var(--text-primary)]" ${a.slug === savedAgent ? 'selected' : ''}>${a.name || a.slug}</option>`).join('');
-        }
-    }).catch(console.error);
-
-    agentSelect.addEventListener('change', (e) => {
-        localStorage.setItem('selectedAgent', e.target.value);
+    let editorView = new EditorView({
+        state: EditorState.create({
+            doc: "// Genera un artifact per visualizzarlo qui\n",
+            extensions: [basicSetup, javascript()]
+        }),
+        parent: editorHost
     });
 
-    // Time ago helper
-    function timeAgo(dateString) {
-        if (!dateString) return '';
-        let date;
-        // Check if it's a number or numeric string (timestamp)
-        if (!isNaN(dateString)) {
-            let ts = parseFloat(dateString);
-            if (ts < 10000000000) ts *= 1000; // Convert seconds to ms
-            date = new Date(ts);
-        } else {
-            // ISO string
-            date = new Date(dateString.endsWith('Z') ? dateString : dateString + 'Z');
-        }
-        
-        const seconds = Math.floor((new Date() - date) / 1000);
-        
-        let interval = seconds / 31536000;
-        if (interval > 1) return Math.floor(interval) + " anni fa";
-        interval = seconds / 2592000;
-        if (interval > 1) return Math.floor(interval) + " mesi fa";
-        interval = seconds / 86400;
-        if (interval > 1) return Math.floor(interval) + " giorni fa";
-        interval = seconds / 3600;
-        if (interval > 1) return Math.floor(interval) + " ore fa";
-        interval = seconds / 60;
-        if (interval > 1) return Math.floor(interval) + " min fa";
-        if (seconds < 0) return "ora";
-        return Math.floor(seconds) + " sec fa";
-    }
+    // Check URL parameters for active agent or chat ID
+    const hashParts = window.location.hash.split('?');
+    const urlParams = new URLSearchParams(hashParts[1] || '');
+    const activeChatId = urlParams.get('id');
+    const urlAgent = urlParams.get('agent');
 
-    // --- Upload Logic ---
-    const btnUpload = container.querySelector('#btn-upload');
-    const uploadPopover = container.querySelector('#upload-popover');
-    const fileUpload = container.querySelector('#file-upload');
-    const uploadStatus = container.querySelector('#upload-status');
-    const chatAttachments = container.querySelector('#chat-attachments');
-
-    if (btnUpload && uploadPopover) {
-        btnUpload.addEventListener('click', (e) => {
-            e.stopPropagation();
-            uploadPopover.classList.toggle('hidden');
-        });
-
-        document.addEventListener('click', (e) => {
-            if (!btnUpload.contains(e.target) && !uploadPopover.contains(e.target)) {
-                uploadPopover.classList.add('hidden');
-            }
-        });
-    }
-
-    if (fileUpload) {
-        fileUpload.addEventListener('change', async (e) => {
-            const files = e.target.files;
-            if (!files || files.length === 0) return;
-            
-            uploadStatus.classList.remove('hidden');
-            uploadStatus.textContent = "Caricamento...";
-            uploadStatus.classList.remove('text-red-500', 'text-green-500');
-            uploadStatus.classList.add('text-[var(--text-secondary)]');
-            
-            try {
-                for (let i = 0; i < files.length; i++) {
-                    const data = await CatAPI.uploadFile(files[i]);
-                    currentAttachments.push({
-                        ...data,
-                        original_name: files[i].name
-                    });
-                    
-                    // Add badge
-                    const badge = document.createElement('div');
-                    badge.className = 'flex items-center gap-1 bg-[var(--bg-primary)] border border-border text-xs px-2 py-1 rounded-md max-w-full';
-                    badge.innerHTML = `
-                        <i data-lucide="file" class="w-3 h-3 flex-shrink-0"></i> 
-                        <span class="truncate max-w-[120px] font-medium" title="${files[i].name}">${files[i].name}</span>
-                        <button type="button" class="text-red-500 hover:text-red-700 ml-1 p-0.5"><i data-lucide="x" class="w-3 h-3"></i></button>
-                    `;
-                    badge.querySelector('button').addEventListener('click', () => {
-                        badge.remove();
-                        currentAttachments = currentAttachments.filter(a => a.url !== data.url);
-                    });
-                    chatAttachments.appendChild(badge);
-                    if(window.lucide) window.lucide.createIcons();
-                }
-                
-                uploadStatus.classList.remove('text-[var(--text-secondary)]');
-                uploadStatus.classList.add('text-green-500');
-                uploadStatus.textContent = "Completato!";
-                
-                setTimeout(() => {
-                    uploadStatus.classList.add('hidden');
-                    uploadPopover.classList.add('hidden');
-                    fileUpload.value = '';
-                }, 1500);
-
-            } catch (err) {
-                console.error("Upload error:", err);
-                uploadStatus.classList.remove('text-[var(--text-secondary)]');
-                uploadStatus.classList.add('text-red-500');
-                uploadStatus.textContent = "Errore upload!";
-            }
-        });
-    }
-
-    // Load Chats
-    async function loadChatList(search = '') {
+    // Load agents dynamically & handle state persistence
+    async function loadAgents() {
         try {
-            const page = await CatAPI.getChats(search);
-            const chats = page.items || page; // Page_ChatSelect_ format usually has .items
-            
-            chatsList.innerHTML = '';
-            if (!chats || chats.length === 0) {
-                chatsList.innerHTML = '<div class="text-center text-xs text-gray-500 mt-4 font-mono">Nessuna chat.</div>';
-                return;
+            const agents = await CatAPI.getAgents();
+            if (agents && agents.length > 0) {
+                agentSelect.innerHTML = agents.map(ag => `
+                    <option value="${ag.slug}">${ag.name || ag.slug}</option>
+                `).join('');
             }
-
-            chats.forEach(chat => {
-                const div = document.createElement('div');
-                div.className = `relative py-2 px-3 rounded-lg flex items-center gap-3 cursor-pointer transition-colors group ${chat.id === currentChatId ? 'bg-[var(--bg-primary)] text-[var(--text-primary)]' : 'hover:bg-[var(--bg-primary)] text-[var(--text-secondary)]'}`;
-
-                const msgCount = Array.isArray(chat.messages) ? chat.messages.length : 0;
-                const time = timeAgo(chat.updated_at || chat.created_at);
-
-                div.innerHTML = `
-                    <div class="flex-1 min-w-0 pr-6">
-                        <div class="font-medium text-sm truncate text-[var(--text-primary)]">${chat.name || 'Nuova Chat'}</div>
-                        <div class="text-[10px] opacity-70 mt-0.5 truncate">${time} &middot; ${msgCount} msgs</div>
-                    </div>
-                    <button class="btn-delete absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-500/10 rounded opacity-0 group-hover:opacity-100 transition-all">
-                        <i data-lucide="trash-2" class="w-3 h-3"></i>
-                    </button>
-                `;
-
-                div.addEventListener('click', (e) => {
-                    if (e.target.closest('.btn-delete')) return;
-                    loadChatMessages(chat);
-                });
-
-                div.querySelector('.btn-delete').addEventListener('click', async (e) => {
-                    e.stopPropagation();
-                    if (confirm('Vuoi eliminare questa chat?')) {
-                        try {
-                            await CatAPI.fetch('/chats/' + chat.id, { method: 'DELETE' });
-                            if (currentChatId === chat.id) btnNewChat.click();
-                            loadChatList();
-                        } catch (err) {
-                            alert('Errore: ' + err.message);
-                        }
-                    }
-                });
-
-                chatsList.appendChild(div);
-            });
-            if(window.lucide) window.lucide.createIcons();
+            
+            // Priority: URL agent > saved localStorage > default
+            if (urlAgent) {
+                agentSelect.value = urlAgent;
+                localStorage.setItem('stregatto_selected_agent', urlAgent);
+            } else {
+                const savedAgent = localStorage.getItem('stregatto_selected_agent');
+                if (savedAgent && agentSelect.querySelector(`option[value="${savedAgent}"]`)) {
+                    agentSelect.value = savedAgent;
+                }
+            }
         } catch (e) {
-            console.error(e);
-            chatsList.innerHTML = '<div class="text-center text-xs text-red-500 mt-4">Errore caricamento.</div>';
+            console.warn("Impossibile caricare agenti:", e);
         }
     }
 
-    loadChatList();
+    loadAgents();
 
-    // Debounced search
-    let searchTimeout;
-    searchInput.addEventListener('input', (e) => {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => loadChatList(e.target.value), 300);
+    agentSelect?.addEventListener('change', () => {
+        if (agentSelect.value) {
+            localStorage.setItem('stregatto_selected_agent', agentSelect.value);
+        }
     });
 
-    btnNewChat.addEventListener('click', () => {
-        currentChatId = null;
-        currentChatName = "Nuova Chat";
-        currentMessages = [];
-        messagesContainer.innerHTML = '';
-        messagesContainer.appendChild(emptyState);
-        emptyState.style.display = 'flex';
-        loadChatList(); // Refresh highlighting
-    });
-
-    function loadChatMessages(chat) {
-        currentChatId = chat.id;
-        currentChatName = chat.name || "Chat";
-        currentMessages = Array.isArray(chat.messages) ? chat.messages : [];
-        messagesContainer.innerHTML = '';
-        emptyState.style.display = 'none';
-        
-        currentMessages.forEach(m => {
-            const role = m.role === 'user' ? 'User' : 'Cat';
-            if (Array.isArray(m.content)) {
-                let text = m.content.find(c => c.type === 'text')?.text || '';
-                const responseBox = appendMessage(role, text, false, false);
+    // Dynamically populate Models dropdown & handle state persistence
+    const modelSelect = container.querySelector('#model-select');
+    if (modelSelect) {
+        CatAPI.getModels().then(models => {
+            if (models && models.length > 0) {
+                modelSelect.innerHTML = models.map(m => `
+                    <option value="${m.id}">${m.name || m.id}</option>
+                `).join('');
                 
-                m.content.filter(c => c.type === 'tool_call' || c.type === 'tool_use').forEach(t => {
-                    responseBox.addTool(t.id || Math.random().toString(36).substr(2, 9), t.name);
-                    const argsStr = typeof t.args === 'string' ? t.args : JSON.stringify(t.args || {});
-                    responseBox.updateToolArgs(t.id, argsStr);
-                });
-            } else {
-                if (m.content) appendMessage(role, m.content, false, false);
+                const savedModel = localStorage.getItem('stregatto_selected_model');
+                if (savedModel && modelSelect.querySelector(`option[value="${savedModel}"]`)) {
+                    modelSelect.value = savedModel;
+                }
+            }
+        }).catch(err => console.warn("Could not load models:", err));
+
+        modelSelect.addEventListener('change', () => {
+            if (modelSelect.value) {
+                localStorage.setItem('stregatto_selected_model', modelSelect.value);
             }
         });
-        loadChatList(); // Update active highlight
     }
 
-    // Appends a message and returns an object to update it (for streaming)
-    function appendMessage(sender, text, isError=false, attachments=[]) {
-        if (emptyState) emptyState.style.display = 'none';
+    // Load conversation history if chatId is provided
+    if (activeChatId) {
+        currentChatId = activeChatId;
+        (async () => {
+            try {
+                const chat = await CatAPI.getChat(activeChatId);
+                if (chat && chat.messages && chat.messages.length > 0) {
+                    if (emptyState) emptyState.remove();
+                    currentMessages = chat.messages;
+                    currentChatName = chat.name || "Chat recuperata";
 
-        const msgDiv = document.createElement('div');
-        const isUser = sender === 'User';
-        
-        msgDiv.className = `flex w-full justify-center mb-8 px-4 ${isError ? 'text-red-500' : ''}`;
-        
-        const innerContainer = document.createElement('div');
-        innerContainer.className = `flex w-full max-w-3xl gap-4 group ${isUser ? 'justify-end' : 'justify-start'}`;
-        
-        // Avatar (Only for Agent)
-        const avatar = document.createElement('div');
-        if (!isUser) {
-            avatar.className = `w-8 h-8 flex items-center justify-center shrink-0 mt-1`;
-            if (sender === 'System') {
-                avatar.innerHTML = '<i data-lucide="alert-triangle" class="w-6 h-6 text-red-500"></i>';
-            } else {
-                avatar.innerHTML = '<i data-lucide="sparkles" class="w-7 h-7 text-[#d97757]"></i>'; // Claude-like rust spark
-            }
-        }
-
-        const content = document.createElement('div');
-        if (isUser) {
-            content.className = 'flex flex-col gap-3 bg-[var(--bg-secondary)] px-5 py-3.5 rounded-2xl max-w-[85%]';
-            
-            if (attachments && attachments.length > 0) {
-                const attGrid = document.createElement('div');
-                attGrid.className = 'flex flex-wrap gap-3 mb-1';
-                attachments.forEach(att => {
-                    const ext = (att.original_name || '').split('.').pop().toUpperCase() || 'FILE';
-                    attGrid.innerHTML += `
-                        <div class="flex items-center gap-3 bg-[var(--bg-primary)] border border-border shadow-sm rounded-xl p-3 min-w-[180px] max-w-[220px]">
-                            <div class="p-2 bg-red-500/10 text-red-600 rounded-lg shrink-0">
-                                <i data-lucide="file-text" class="w-5 h-5"></i>
-                            </div>
-                            <div class="flex flex-col min-w-0">
-                                <span class="text-sm font-semibold truncate text-[var(--text-primary)]">${att.original_name || 'Document'}</span>
-                                <span class="text-[10px] font-bold text-gray-400 mt-0.5">${ext}</span>
-                            </div>
-                        </div>
-                    `;
-                });
-                content.appendChild(attGrid);
-            }
-        } else {
-            content.className = 'flex-1 pt-1 min-w-0 flex flex-col gap-2'; 
-        }
-
-        const reasoningContainer = document.createElement('div');
-        reasoningContainer.className = 'hidden';
-        reasoningContainer.innerHTML = `
-            <details class="text-xs text-[var(--text-secondary)] bg-[var(--bg-secondary)] border border-border rounded-lg p-2">
-                <summary class="cursor-pointer font-semibold select-none flex items-center gap-1"><i data-lucide="brain" class="w-3 h-3"></i> Ragionamento</summary>
-                <div class="mt-2 whitespace-pre-wrap font-mono opacity-80" id="reasoning-text"></div>
-            </details>
-        `;
-
-        const body = document.createElement('div');
-        body.className = 'markdown-body text-[15px] leading-relaxed overflow-hidden';
-        
-        const toolsContainer = document.createElement('div');
-        toolsContainer.className = 'flex flex-col gap-2 mt-2 empty:hidden';
-
-        if (isUser) {
-            if (text) {
-                body.textContent = text;
-                body.style.whiteSpace = 'pre-wrap';
-                content.appendChild(body);
-            }
-        } else {
-            body.innerHTML = DOMPurify.sanitize(marked.parse(text));
-            content.appendChild(reasoningContainer);
-            content.appendChild(toolsContainer);
-            content.appendChild(body);
-            
-            // Claude-style action bar for AI
-            const actionBar = document.createElement('div');
-            actionBar.className = 'flex items-center gap-1.5 mt-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200';
-            actionBar.innerHTML = `
-                <button class="btn-copy p-1.5 text-gray-400 hover:text-[var(--text-primary)] hover:bg-black/5 dark:hover:bg-white/10 rounded-md transition-colors" title="Copia"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button>
-                <button class="btn-retry p-1.5 text-gray-400 hover:text-[var(--text-primary)] hover:bg-black/5 dark:hover:bg-white/10 rounded-md transition-colors ml-1" title="Riprova"><i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i></button>
-            `;
-            content.appendChild(actionBar);
-            
-            const btnCopy = actionBar.querySelector('.btn-copy');
-            const btnRetry = actionBar.querySelector('.btn-retry');
-            
-            btnCopy.addEventListener('click', () => {
-                navigator.clipboard.writeText(rawTextForCopy || body.textContent).then(() => {
-                    const icon = btnCopy.querySelector('i');
-                    const oldIcon = icon.getAttribute('data-lucide');
-                    icon.setAttribute('data-lucide', 'check');
-                    icon.classList.add('text-green-500');
-                    if (window.lucide) window.lucide.createIcons();
-                    setTimeout(() => {
-                        icon.setAttribute('data-lucide', oldIcon);
-                        icon.classList.remove('text-green-500');
-                        if (window.lucide) window.lucide.createIcons();
-                    }, 2000);
-                });
-            });
-            
-            btnRetry.addEventListener('click', () => {
-                if (window.triggerRetry) {
-                    window.triggerRetry(msgDiv);
-                }
-            });
-        }
-        
-        if (!isUser) {
-            innerContainer.appendChild(avatar);
-        }
-        innerContainer.appendChild(content);
-        
-        msgDiv.appendChild(innerContainer);
-        messagesContainer.appendChild(msgDiv);
-        
-        if(window.lucide) window.lucide.createIcons();
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        
-        let toolCalls = {}; // id -> HTMLElement
-        let rawTextForCopy = text;
-
-        return {
-            element: msgDiv,
-            updateText: (newText) => {
-                rawTextForCopy = newText;
-                body.innerHTML = DOMPurify.sanitize(marked.parse(newText));
-                if (window.lucide) window.lucide.createIcons();
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            },
-            showLoader: () => {
-                body.innerHTML = `
-                    <div class="flex items-center gap-1.5 h-6">
-                        <div class="w-1.5 h-1.5 rounded-full bg-[var(--accent-color)] animate-bounce" style="animation-delay: 0ms"></div>
-                        <div class="w-1.5 h-1.5 rounded-full bg-[var(--accent-color)] animate-bounce" style="animation-delay: 150ms"></div>
-                        <div class="w-1.5 h-1.5 rounded-full bg-[var(--accent-color)] animate-bounce" style="animation-delay: 300ms"></div>
-                    </div>
-                `;
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            },
-            updateReasoning: (newText) => {
-                reasoningContainer.classList.remove('hidden');
-                reasoningContainer.querySelector('#reasoning-text').textContent = newText;
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            },
-            addTool: (toolId, toolName) => {
-                if (toolName === 'create_artifact') {
-                    // Initialize artifact tracking
-                    toolCalls[toolId] = { isArtifact: true, name: toolName, argsRaw: "", title: 'Generazione in corso...', language: 'text', content: '' };
-                    
-                    // Add visual artifact card in chat
-                    const toolDiv = document.createElement('div');
-                    toolDiv.className = 'my-3 p-3 border border-border rounded-xl bg-[var(--bg-secondary)] flex items-center gap-3 cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors artifact-card';
-                    toolDiv.innerHTML = `
-                        <div class="p-2 bg-[var(--accent-color)] text-white rounded-lg opacity-90">
-                            <i data-lucide="file-code" class="w-5 h-5"></i>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="font-semibold text-sm truncate artifact-title">Scrittura codice...</div>
-                            <div class="text-xs text-[var(--text-secondary)] opacity-80 artifact-lang">Artifact</div>
-                        </div>
-                        <div class="w-1.5 h-1.5 rounded-full bg-[var(--accent-color)] animate-ping"></div>
-                    `;
-                    toolsContainer.appendChild(toolDiv);
-                    toolCalls[toolId].element = toolDiv;
-                    
-                    // Add click to open Canvas
-                    toolDiv.addEventListener('click', () => {
-                        canvasPanel.classList.remove('hidden');
-                        canvasPanel.classList.add('flex');
-                        updateSidebarToggles();
-                    });
-
-                    if(window.lucide) window.lucide.createIcons();
-
-                    // Auto-open canvas
-                    if (canvasPanel.classList.contains('hidden')) {
-                        canvasPanel.classList.remove('hidden');
-                        canvasPanel.classList.add('flex');
-                        updateSidebarToggles();
-                    }
-                } else {
-                    const toolDiv = document.createElement('div');
-                    toolDiv.className = 'text-xs text-[var(--text-secondary)] bg-[var(--bg-secondary)] border border-border rounded-lg p-2 flex flex-col gap-1';
-                    toolDiv.innerHTML = `<div class="font-semibold flex items-center gap-1"><i data-lucide="wrench" class="w-3 h-3"></i> Tool: <span class="text-[var(--accent-color)]">${toolName}</span>...</div><div class="font-mono opacity-80 tool-args"></div>`;
-                    toolsContainer.appendChild(toolDiv);
-                    if(window.lucide) window.lucide.createIcons();
-                    toolCalls[toolId] = { isArtifact: false, name: toolName, argsRaw: "", element: toolDiv };
-                }
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            },
-            updateToolArgs: (toolId, argsStr) => {
-                const tool = toolCalls[toolId];
-                if (!tool) return;
-                tool.argsRaw = argsStr;
-
-                if (tool.isArtifact) {
-                    // Very simple JSON stream parsing (Best Effort)
-                    // We look for "title", "language" and "content" in the raw string.
-                    
-                    let titleMatch = argsStr.match(/"title"\s*:\s*"([^"\\]*(?:\\.[^"\\]*)*)"?/);
-                    if (titleMatch) {
-                        tool.title = titleMatch[1].replace(/\\"/g, '"');
-                        tool.element.querySelector('.artifact-title').textContent = tool.title;
-                        
-                        const canvasTitle = document.getElementById('canvas-title');
-                        if (canvasTitle && canvasTitle.dataset.currentId !== toolId) {
-                            canvasTitle.dataset.currentId = toolId;
-                            canvasTitle.innerHTML = `<i data-lucide="file-code" class="w-4 h-4 flex-shrink-0"></i> ${tool.title}`;
-                            if(window.lucide) window.lucide.createIcons();
-                        }
+                    // Restore saved agent slug from chat context if available
+                    if (chat.context && chat.context.agent_slug && agentSelect) {
+                        agentSelect.value = chat.context.agent_slug;
+                        localStorage.setItem('stregatto_selected_agent', chat.context.agent_slug);
                     }
 
-                    let langMatch = argsStr.match(/"language"\s*:\s*"([^"\\]*(?:\\.[^"\\]*)*)"?/);
-                    if (langMatch) {
-                        tool.language = langMatch[1].replace(/\\"/g, '"');
-                        tool.element.querySelector('.artifact-lang').textContent = `Artifact • ${tool.language}`;
-                    }
+                    chat.messages.forEach(msg => {
+                        const role = msg.role || 'assistant';
+                        
+                        if (role === 'user') {
+                            const text = extractTextFromContent(msg.content);
+                            appendMessage('user', text || "");
+                        } else {
+                            const msgBox = appendMessage('assistant', "");
 
-                    let contentMatch = argsStr.match(/"content"\s*:\s*"(.*)/s);
-                    if (contentMatch) {
-                        let rawContent = contentMatch[1];
-                        // Strip trailing quotes or brackets if JSON is ending
-                        if (rawContent.endsWith('"}')) rawContent = rawContent.slice(0, -2);
-                        else if (rawContent.endsWith('"')) rawContent = rawContent.slice(0, -1);
-                        else if (rawContent.endsWith('"} \n')) rawContent = rawContent.slice(0, -4);
-                        
-                        // Try native parse first, fallback to regex replace
-                        let decoded = "";
-                        try {
-                            decoded = JSON.parse('"' + rawContent + '"');
-                        } catch(e) {
-                            decoded = rawContent.replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\\\/g, '\\').replace(/\\t/g, '\t');
-                        }
-                        
-                        if (decoded !== tool.content) {
-                            tool.content = decoded;
-                            // Only update CodeMirror if it's the currently viewed artifact
-                            const canvasTitle = document.getElementById('canvas-title');
-                            if (canvasTitle && canvasTitle.dataset.currentId === toolId) {
-                                const transaction = editorView.state.update({
-                                    changes: {from: 0, to: editorView.state.doc.length, insert: tool.content}
+                            if (Array.isArray(msg.content)) {
+                                msg.content.forEach(c => {
+                                    if (!c) return;
+                                    if (c.type === 'text' && c.text) {
+                                        msgBox.appendStepText(c.text);
+                                    } else if (c.type === 'tool_use' || c.type === 'tool_call') {
+                                        const tcName = c.name || c.function?.name || 'tool';
+                                        const tcArgs = typeof c.input === 'string' ? c.input : (c.input ? JSON.stringify(c.input, null, 2) : (c.arguments || ''));
+                                        const tcId = c.id || ("tc_" + Math.random().toString(36).substr(2, 9));
+
+                                        msgBox.addTool(tcId, tcName);
+                                        msgBox.updateToolArgs(tcId, tcArgs);
+                                        msgBox.finishTool(tcId, tcArgs);
+                                    }
                                 });
-                                editorView.dispatch(transaction);
+                            } else {
+                                const text = extractTextFromContent(msg.content);
+                                msgBox.appendStepText(text || "");
                             }
                         }
-                    }
-                } else {
-                    tool.element.querySelector('.tool-args').textContent = argsStr;
+                    });
                 }
-            },
-            extractCode: (newText) => {
-                // Deprecated: Artifact XML tags are now parsed directly in updateText
-            },
-            getToolCalls: () => toolCalls
-        };
+            } catch (err) {
+                console.error("Errore caricamento dettagli chat:", err);
+            }
+        })();
     }
 
-    // Input handlers
-    chatInput.addEventListener('input', function() {
-        this.style.height = 'auto';
-        this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+    // Copy Code handler
+    if (btnCopyCode) {
+        btnCopyCode.addEventListener('click', () => {
+            const code = editorView.state.doc.toString();
+            navigator.clipboard.writeText(code);
+            const originalHTML = btnCopyCode.innerHTML;
+            btnCopyCode.innerHTML = `<span class="material-symbols-outlined text-sm">check</span> Copiato`;
+            setTimeout(() => { btnCopyCode.innerHTML = originalHTML; }, 2000);
+        });
+    }
+
+    // Right Sidebar Resizer & Toggle
+    const rightResizer = container.querySelector('#right-sidebar-resizer');
+
+    function openSidebar() {
+        if (rightSidebar) {
+            rightSidebar.classList.remove('hidden');
+            rightSidebar.classList.add('flex');
+            rightSidebar.classList.add('artifacts-expanded');
+            rightSidebar.classList.remove('artifacts-collapsed');
+            const w = localStorage.getItem('stregatto_right_sidebar_width');
+            if (w) rightSidebar.style.width = w;
+        }
+    }
+
+    if (rightSidebarToggle && rightSidebar) {
+        rightSidebarToggle.addEventListener('click', () => {
+            if (rightSidebar.classList.contains('artifacts-expanded')) {
+                rightSidebar.classList.remove('artifacts-expanded');
+                rightSidebar.classList.add('artifacts-collapsed');
+                rightSidebar.style.width = '';
+            } else {
+                rightSidebar.classList.remove('hidden');
+                rightSidebar.classList.add('flex');
+                rightSidebar.classList.add('artifacts-expanded');
+                rightSidebar.classList.remove('artifacts-collapsed');
+                const w = localStorage.getItem('stregatto_right_sidebar_width');
+                if (w) rightSidebar.style.width = w;
+            }
+        });
+    }
+
+    if (rightSidebarClose && rightSidebar) {
+        rightSidebarClose.addEventListener('click', () => {
+            rightSidebar.classList.add('artifacts-collapsed');
+            rightSidebar.classList.remove('artifacts-expanded');
+            rightSidebar.style.width = '';
+        });
+    }
+
+    if (rightResizer && rightSidebar) {
+        let isResizingRight = false;
+
+        rightResizer.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            if (rightSidebar.classList.contains('artifacts-collapsed')) return;
+            isResizingRight = true;
+            rightSidebar.classList.remove('sidebar-transition');
+            document.body.classList.add('select-none');
+            document.body.style.cursor = 'col-resize';
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isResizingRight) return;
+            let newWidth = rightSidebar.getBoundingClientRect().right - e.clientX;
+            if (newWidth < 260) newWidth = 260;
+            if (newWidth > Math.min(900, window.innerWidth * 0.6)) newWidth = Math.min(900, window.innerWidth * 0.6);
+            rightSidebar.style.width = `${newWidth}px`;
+            localStorage.setItem('stregatto_right_sidebar_width', `${newWidth}px`);
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (isResizingRight) {
+                isResizingRight = false;
+                rightSidebar.classList.add('sidebar-transition');
+                document.body.classList.remove('select-none');
+                document.body.style.cursor = '';
+            }
+        });
+    }
+
+    // Bento prompts handler
+    bentoPrompts.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const promptText = btn.dataset.prompt;
+            if (promptText && chatInput) {
+                chatInput.value = promptText;
+                chatForm.dispatchEvent(new Event('submit'));
+            }
+        });
     });
 
-    chatInput.addEventListener('keydown', (e) => {
+    // Auto-resize textarea
+    chatInput?.addEventListener('input', () => {
+        chatInput.style.height = 'auto';
+        chatInput.style.height = `${Math.min(chatInput.scrollHeight, 180)}px`;
+    });
+    
+    // File upload logic
+    const btnUpload = container.querySelector('#btn-upload');
+    const fileUploadInput = container.querySelector('#file-upload-input');
+    
+    if (btnUpload && fileUploadInput) {
+        btnUpload.addEventListener('click', () => {
+            fileUploadInput.click();
+        });
+
+        fileUploadInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            logTerminal(`Caricamento file: ${file.name}...`);
+            try {
+                const res = await CatAPI.uploadFile(file);
+                if (res && res.url) {
+                    logTerminal(`File caricato: ${res.url}`);
+                    // Add the file as a system context message or inject to chat
+                    currentMessages.push({ role: 'user', content: [{ type: "file", file_url: res.url }] });
+                    appendMessage('user', `📄 [File allegato: ${file.name}]`);
+                    
+                    if (!currentChatId && currentMessages.length === 1) {
+                        currentChatName = `Chat con file ${file.name}`;
+                    }
+                }
+            } catch (err) {
+                logTerminal(`Errore caricamento file: ${err.message}`);
+                alert('Errore durante il caricamento del file.');
+            }
+            fileUploadInput.value = '';
+        });
+    }
+
+    // Enter to submit
+    chatInput?.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             chatForm.dispatchEvent(new Event('submit'));
         }
     });
 
-    window.triggerRetry = (msgDiv) => {
-        if (currentMessages.length > 0 && currentMessages[currentMessages.length - 1].role === 'assistant') {
+    // Helper: extract text from complex content
+    function extractTextFromContent(content) {
+        if (typeof content === 'string') return content;
+        if (Array.isArray(content)) {
+            return content.map(c => {
+                if (typeof c === 'string') return c;
+                if (c && c.text) return c.text;
+                return '';
+            }).join('\n');
+        }
+        if (content && content.text) return content.text;
+        return JSON.stringify(content || '');
+    }
+
+    // Helper: Append message to chat container (Delicate Timeline Layout)
+    function appendMessage(role, text) {
+        if (emptyState) emptyState.remove();
+
+        const isUser = role === 'user';
+        const msgBox = document.createElement('div');
+
+        if (isUser) {
+            msgBox.className = 'flex justify-end w-full mb-lg pr-xs';
+
+            const userCard = document.createElement('div');
+            userCard.className = 'max-w-[80%] bg-surface-container-lowest border-2 border-on-surface p-md shadow-[4px_4px_0px_0px_#1a1c1c] text-on-surface font-body-md flex flex-col gap-xs relative group';
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'font-medium text-sm leading-relaxed whitespace-pre-wrap text-on-surface';
+            contentDiv.textContent = text;
+
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'mt-xs flex justify-end gap-xs opacity-60 hover:opacity-100 transition-opacity';
+            actionsDiv.innerHTML = `
+                <button class="btn-copy-user flex items-center gap-1 px-1.5 py-0.5 bg-surface border border-on-surface text-[10px] font-bold uppercase hover:bg-surface-variant transition-colors" title="Copia testo">
+                    <span class="material-symbols-outlined text-[12px]">content_copy</span> COPY
+                </button>
+            `;
+
+            actionsDiv.querySelector('.btn-copy-user').addEventListener('click', () => {
+                navigator.clipboard.writeText(text);
+                const btn = actionsDiv.querySelector('.btn-copy-user');
+                btn.innerHTML = `<span class="material-symbols-outlined text-[12px]">check</span> COPIED`;
+                setTimeout(() => {
+                    btn.innerHTML = `<span class="material-symbols-outlined text-[12px]">content_copy</span> COPY`;
+                }, 1500);
+            });
+
+            userCard.appendChild(contentDiv);
+            userCard.appendChild(actionsDiv);
+            msgBox.appendChild(userCard);
+        } else {
+            // Agent Response with Delicate Timeline Layout (Left-aligned & Spacious)
+            msgBox.className = 'max-w-6xl relative pl-10 w-full mb-xl ml-2 md:ml-6';
+
+            // Vertical Timeline Guide Line
+            const timelineLine = document.createElement('div');
+            timelineLine.className = 'timeline-line';
+            msgBox.appendChild(timelineLine);
+
+            // Agent Header Badge
+            const agentHeader = document.createElement('div');
+            agentHeader.className = 'flex items-center gap-sm mb-md -ml-10 relative z-10';
+            agentHeader.innerHTML = `
+                <div class="w-6 h-6 bg-primary border-2 border-on-surface flex items-center justify-center text-on-primary shadow-[2px_2px_0px_0px_#1a1c1c]">
+                    <span class="material-symbols-outlined text-xs">smart_toy</span>
+                </div>
+                <span class="font-label-sm text-[11px] font-black uppercase tracking-widest bg-surface-container-lowest px-2 py-0.5 border-2 border-on-surface">AGENT</span>
+            `;
+            msgBox.appendChild(agentHeader);
+
+            // Inner Steps Container (stores all steps in chronological order)
+            const stepsContainer = document.createElement('div');
+            stepsContainer.className = 'space-y-md relative';
+            msgBox.appendChild(stepsContainer);
+
+            // Agent Actions Footer (Copy / Regenerate)
+            const actionsFooter = document.createElement('div');
+            actionsFooter.className = 'flex items-center gap-md pt-xs opacity-50 hover:opacity-100 transition-opacity pl-xs';
+            actionsFooter.innerHTML = `
+                <button class="btn-copy-agent flex items-center gap-xs font-label-sm text-[11px] font-bold uppercase tracking-wider hover:text-primary transition-colors">
+                    <span class="material-symbols-outlined text-xs">content_copy</span> Copy
+                </button>
+                <button class="btn-regenerate-agent flex items-center gap-xs font-label-sm text-[11px] font-bold uppercase tracking-wider hover:text-primary transition-colors">
+                    <span class="material-symbols-outlined text-xs">refresh</span> Regenerate
+                </button>
+            `;
+
+            actionsFooter.querySelector('.btn-copy-agent').addEventListener('click', () => {
+                const textContent = Array.from(stepsContainer.querySelectorAll('.markdown-body'))
+                    .map(b => b.innerText || b.textContent)
+                    .join('\n\n');
+                navigator.clipboard.writeText(textContent);
+                const btn = actionsFooter.querySelector('.btn-copy-agent');
+                btn.innerHTML = `<span class="material-symbols-outlined text-xs">check</span> Copied`;
+                setTimeout(() => {
+                    btn.innerHTML = `<span class="material-symbols-outlined text-xs">content_copy</span> Copy`;
+                }, 1500);
+            });
+
+            actionsFooter.querySelector('.btn-regenerate-agent').addEventListener('click', () => {
+                regenerateResponse(msgBox);
+            });
+
+            msgBox.appendChild(actionsFooter);
+        }
+
+        messagesContainer.appendChild(msgBox);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+        let activeTextStep = null;
+        let toolCalls = {};
+
+        function createTextStep(initialText = '') {
+            if (isUser) return null;
+            const stepsContainer = msgBox.querySelector('.space-y-md');
+            if (!stepsContainer) return null;
+
+            const stepDiv = document.createElement('div');
+            stepDiv.className = 'relative my-xs';
+
+            const dot = document.createElement('div');
+            dot.className = 'timeline-dot';
+            stepDiv.appendChild(dot);
+
+            const card = document.createElement('div');
+            card.className = 'bg-surface-container-lowest border-2 border-on-surface p-md shadow-[4px_4px_0px_0px_#1a1c1c] max-w-4xl w-full';
+
+            const body = document.createElement('div');
+            body.className = 'markdown-body text-sm leading-relaxed overflow-hidden';
+
+            if (initialText && window.marked && window.DOMPurify) {
+                body.innerHTML = window.DOMPurify.sanitize(window.marked.parse(initialText));
+            } else {
+                body.textContent = initialText;
+            }
+
+            card.appendChild(body);
+            stepDiv.appendChild(card);
+
+            stepsContainer.appendChild(stepDiv);
+            activeTextStep = { stepDiv, body, text: initialText };
+            return activeTextStep;
+        }
+
+        if (!isUser && text) {
+            createTextStep(text);
+        }
+
+        return {
+            element: msgBox,
+            appendStepText: (textChunk) => {
+                if (isUser || !textChunk) return;
+                if (!activeTextStep) {
+                    createTextStep(textChunk);
+                } else if (activeTextStep.isLoader) {
+                    activeTextStep.isLoader = false;
+                    activeTextStep.text = textChunk;
+                    if (window.marked && window.DOMPurify) {
+                        activeTextStep.body.innerHTML = window.DOMPurify.sanitize(window.marked.parse(activeTextStep.text));
+                    } else {
+                        activeTextStep.body.textContent = activeTextStep.text;
+                    }
+                } else {
+                    activeTextStep.text += textChunk;
+                    if (window.marked && window.DOMPurify) {
+                        activeTextStep.body.innerHTML = window.DOMPurify.sanitize(window.marked.parse(activeTextStep.text));
+                    } else {
+                        activeTextStep.body.textContent = activeTextStep.text;
+                    }
+                }
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            },
+            updateText: (newText) => {
+                if (isUser) return;
+                if (!activeTextStep) {
+                    createTextStep(newText);
+                } else {
+                    activeTextStep.isLoader = false;
+                    activeTextStep.text = newText;
+                    if (window.marked && window.DOMPurify) {
+                        activeTextStep.body.innerHTML = window.DOMPurify.sanitize(window.marked.parse(activeTextStep.text));
+                    } else {
+                        activeTextStep.body.textContent = activeTextStep.text;
+                    }
+                }
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            },
+            showLoader: () => {
+                if (isUser) return;
+                if (!activeTextStep) {
+                    createTextStep('');
+                }
+                if (activeTextStep && activeTextStep.body) {
+                    activeTextStep.isLoader = true;
+                    activeTextStep.body.innerHTML = `
+                        <div class="flex items-center gap-2 h-6 p-xs">
+                            <div class="w-2 h-2 rounded-none bg-primary animate-bounce" style="animation-delay: 0ms"></div>
+                            <div class="w-2 h-2 rounded-none bg-primary animate-bounce" style="animation-delay: 150ms"></div>
+                            <div class="w-2 h-2 rounded-none bg-primary animate-bounce" style="animation-delay: 300ms"></div>
+                        </div>
+                    `;
+                }
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            },
+            addTool: (toolId, toolName) => {
+                if (isUser) return;
+                
+                // If active step is a loader step, remove it from DOM
+                if (activeTextStep && activeTextStep.isLoader) {
+                    if (activeTextStep.stepDiv && activeTextStep.stepDiv.parentNode) {
+                        activeTextStep.stepDiv.parentNode.removeChild(activeTextStep.stepDiv);
+                    }
+                }
+                activeTextStep = null; // Close active text step so subsequent text creates a new step below this tool call
+
+                const stepsContainer = msgBox.querySelector('.space-y-md');
+                if (!stepsContainer) return;
+
+                const stepDiv = document.createElement('div');
+                stepDiv.className = 'relative my-xs';
+
+                const stepDot = document.createElement('div');
+                stepDot.className = 'timeline-dot';
+                stepDiv.appendChild(stepDot);
+
+                if (toolName === 'create_artifact') {
+                    toolCalls[toolId] = { isArtifact: true, title: 'Generazione Artifact...', content: '' };
+
+                    const card = document.createElement('div');
+                    card.className = 'p-sm border-2 border-on-surface bg-surface-container flex items-center justify-between cursor-pointer hover:bg-surface-variant transition-colors artifact-card shadow-[2px_2px_0px_0px_#1a1c1c] hover:shadow-[4px_4px_0px_0px_#ff5f1f] max-w-2xl';
+                    card.innerHTML = `
+                        <div class="flex items-center gap-sm min-w-0">
+                            <div class="p-xs bg-on-surface text-on-primary shrink-0">
+                                <span class="material-symbols-outlined text-lg">code_blocks</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="font-label-md text-label-md font-bold truncate artifact-title">Generazione Artifact...</div>
+                                <div class="font-label-sm text-label-sm text-secondary truncate artifact-lang">Attendere prego</div>
+                            </div>
+                        </div>
+                        <div class="w-2 h-2 bg-primary animate-ping"></div>
+                    `;
+
+                    card.addEventListener('click', () => {
+                        openSidebar();
+                        if (canvasTitle) canvasTitle.innerHTML = `<span class="material-symbols-outlined text-sm">code_blocks</span> ${toolCalls[toolId].title}`;
+                        const transaction = editorView.state.update({
+                            changes: {from: 0, to: editorView.state.doc.length, insert: toolCalls[toolId].content || '// Nessun contenuto'}
+                        });
+                        editorView.dispatch(transaction);
+                    });
+
+                    stepDiv.appendChild(card);
+                    openSidebar();
+                } else {
+                    // Tool Call (Compact Accordion)
+                    const details = document.createElement('details');
+                    details.className = 'group border-2 border-on-surface shadow-[2px_2px_0px_0px_#1a1c1c] max-w-3xl bg-surface-container-lowest overflow-hidden';
+                    details.innerHTML = `
+                        <summary class="flex items-center justify-between cursor-pointer list-none p-sm bg-surface-container border-b-2 border-on-surface select-none">
+                            <div class="flex items-center gap-sm">
+                                <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                <div>
+                                    <span class="text-[9px] font-black uppercase text-secondary block leading-none mb-0.5 tracking-wider">TOOL EXECUTED</span>
+                                    <span class="text-xs font-mono font-bold text-on-surface">${toolName}</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-xs">
+                                <span class="text-[10px] font-mono text-secondary tool-timer">executing...</span>
+                                <span class="material-symbols-outlined text-sm transition-transform group-open:rotate-180">expand_more</span>
+                            </div>
+                        </summary>
+                        <div class="p-md bg-[#1a1c1c] text-green-400 font-mono text-xs overflow-x-auto tool-args-code">
+                            <code>{ "status": "running" }</code>
+                        </div>
+                    `;
+                    toolCalls[toolId] = { isArtifact: false, element: details };
+                    stepDiv.appendChild(details);
+                }
+
+                toolCalls[toolId].stepDiv = stepDiv;
+                stepsContainer.appendChild(stepDiv);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            },
+            updateToolArgs: (toolId, argsStr) => {
+                const tool = toolCalls[toolId];
+                if (!tool) return;
+
+                if (tool.isArtifact) {
+                    let titleMatch = argsStr.match(/"title"\s*:\s*"([^"\\]*(?:\\.[^"\\]*)*)"?/);
+                    if (titleMatch) {
+                        tool.title = titleMatch[1].replace(/\\"/g, '"');
+                        const el = tool.stepDiv.querySelector('.artifact-title');
+                        if (el) el.textContent = tool.title;
+                    }
+                    let langMatch = argsStr.match(/"language"\s*:\s*"([^"\\]*(?:\\.[^"\\]*)*)"?/);
+                    if (langMatch) {
+                        tool.language = langMatch[1].replace(/\\"/g, '"');
+                        const el = tool.stepDiv.querySelector('.artifact-lang');
+                        if (el) el.textContent = `Lingua: ${tool.language}`;
+                    }
+                } else {
+                    const codeEl = tool.stepDiv.querySelector('.tool-args-code code');
+                    if (codeEl) codeEl.textContent = argsStr || '{ "status": "running" }';
+                }
+            },
+            finishTool: (toolId, argsStr) => {
+                const tool = toolCalls[toolId];
+                if (!tool) return;
+
+                if (tool.isArtifact) {
+                    try {
+                        const parsedArgs = JSON.parse(argsStr);
+                        tool.title = parsedArgs.title || tool.title;
+                        tool.content = parsedArgs.content || "";
+                        const el = tool.stepDiv.querySelector('.artifact-title');
+                        if (el) el.textContent = tool.title;
+
+                        const ping = tool.stepDiv.querySelector('.animate-ping');
+                        if (ping) ping.remove();
+
+                        if (canvasTitle) canvasTitle.innerHTML = `<span class="material-symbols-outlined text-sm">code_blocks</span> ${tool.title}`;
+                        const transaction = editorView.state.update({
+                            changes: {from: 0, to: editorView.state.doc.length, insert: tool.content}
+                        });
+                        editorView.dispatch(transaction);
+
+                    } catch (e) {
+                        console.warn("Failed to parse artifact JSON payload:", e);
+                    }
+                } else {
+                    const timerEl = tool.stepDiv.querySelector('.tool-timer');
+                    if (timerEl) timerEl.textContent = 'done';
+                    const codeEl = tool.stepDiv.querySelector('.tool-args-code code');
+                    if (codeEl && argsStr) codeEl.textContent = argsStr;
+                }
+            }
+        };
+    }
+
+    // Helper: Regenerate assistant response
+    function regenerateResponse(targetMsgBox) {
+        while (currentMessages.length > 0 && currentMessages[currentMessages.length - 1].role === 'assistant') {
             currentMessages.pop();
         }
-        msgDiv.remove();
-        chatInput.disabled = true;
-        triggerAIResponse();
-    };
+        if (targetMsgBox && targetMsgBox.parentNode) {
+            targetMsgBox.parentNode.removeChild(targetMsgBox);
+        }
+        const responseBox = appendMessage('assistant', '');
+        executeAssistantRun(responseBox);
+    }
 
-    // Extract AI streaming logic into a reusable function
-    async function triggerAIResponse() {
-        const agentSlug = agentSelect.value || 'default';
-        const responseBox = appendMessage('Cat', '');
+    // Helper: Execute LLM run streaming
+    async function executeAssistantRun(responseBox) {
+        if (!responseBox) {
+            responseBox = appendMessage('assistant', '');
+        }
         responseBox.showLoader();
-        let accumulatedText = "";
-        let accumulatedReasoning = "";
-        let currentToolArgs = "";
+
+        if (chatInput) chatInput.disabled = true;
+        const agentSlug = agentSelect?.value || 'default';
+        logTerminal(`Generazione risposta dall'agente [${agentSlug}]...`);
 
         try {
-            await CatAPI.streamMessage(currentMessages, agentSlug, (event) => {
+            let accumulatedText = '';
+            let currentToolArgs = '';
+            let currentToolCallName = '';
+            let currentToolCalls = [];
+            
+            const sanitizeMessagesForApi = (messages) => {
+                let cleanMessages = messages.map(m => {
+                    let cleanContent = [];
+                    if (Array.isArray(m.content)) {
+                        m.content.forEach(c => {
+                            if (!c) return;
+                            if (c.type === 'text' || c.type === 'file' || c.type === 'image') {
+                                cleanContent.push(c);
+                            } else if (c.type === 'tool_use' || c.type === 'tool_call') {
+                                cleanContent.push(c);
+                            }
+                        });
+                    } else if (typeof m.content === 'string') {
+                        cleanContent.push({ type: 'text', text: m.content });
+                    }
+                    if (cleanContent.length === 0) {
+                        cleanContent.push({ type: 'text', text: '' });
+                    }
+                    return {
+                        role: m.role || 'user',
+                        content: cleanContent
+                    };
+                });
+
+                // Guarantee LLM payload never ends with an assistant message
+                while (cleanMessages.length > 0 && cleanMessages[cleanMessages.length - 1].role === 'assistant') {
+                    cleanMessages.pop();
+                }
+
+                return cleanMessages;
+            };
+
+            const sanitizedStreamMessages = sanitizeMessagesForApi(currentMessages);
+
+            await CatAPI.streamMessage(sanitizedStreamMessages, agentSlug, (event) => {
                 if (event.type === 'TEXT_MESSAGE_CONTENT' || event.type === 'TEXT_MESSAGE_CHUNK') {
-                    accumulatedText += event.delta || '';
-                    responseBox.updateText(accumulatedText);
-                } else if (event.type === 'REASONING_MESSAGE_CONTENT' || event.type === 'THINKING_TEXT_MESSAGE_CONTENT' || event.type === 'REASONING_MESSAGE_CHUNK') {
-                    accumulatedReasoning += event.delta || '';
-                    responseBox.updateReasoning(accumulatedReasoning);
+                    const delta = event.delta || '';
+                    accumulatedText += delta;
+                    responseBox.appendStepText(delta);
                 } else if (event.type === 'TOOL_CALL_START') {
+                    currentToolCallName = event.tool_call_name;
+                    if (event.tool_call_name === 'create_artifact') {
+                        artifactToolCalls[event.tool_call_id] = { args: "" };
+                    }
+                    currentToolCalls.push({
+                        id: event.tool_call_id,
+                        type: 'function',
+                        function: { name: event.tool_call_name, arguments: "" }
+                    });
                     responseBox.addTool(event.tool_call_id, event.tool_call_name);
-                    currentToolArgs = "";
                 } else if (event.type === 'TOOL_CALL_ARGS' || event.type === 'TOOL_CALL_CHUNK') {
-                    currentToolArgs += event.delta || '';
-                    responseBox.updateToolArgs(event.tool_call_id, currentToolArgs);
-                } else if (event.type === 'RUN_FINISHED') {
-                    responseBox.extractCode(accumulatedText);
-                    responseBox.element.querySelectorAll('.animate-ping').forEach(el => el.classList.remove('animate-ping'));
-                    if (!accumulatedText) {
-                        responseBox.updateText(""); // Clear the bounce loader
+                    let tc = currentToolCalls.find(t => t.id === event.tool_call_id);
+                    if (tc) {
+                        tc.function.arguments += event.delta || '';
                     }
                     
-                    const contentArray = [{ type: "text", text: accumulatedText }];
-                    const calls = responseBox.getToolCalls();
-                    for (const [id, tool] of Object.entries(calls)) {
-                        let parsedArgs = {};
-                        try { parsedArgs = JSON.parse(tool.argsRaw); } catch(e) {}
-                        contentArray.push({
-                            type: "tool_call",
-                            id: id,
-                            name: tool.name,
-                            args: parsedArgs
+                    if (artifactToolCalls[event.tool_call_id]) {
+                        artifactToolCalls[event.tool_call_id].args += event.delta || '';
+                        responseBox.updateToolArgs(event.tool_call_id, artifactToolCalls[event.tool_call_id].args);
+                    } else {
+                        currentToolArgs += event.delta || '';
+                        responseBox.updateToolArgs(event.tool_call_id, currentToolArgs);
+                    }
+                } else if (event.type === 'TOOL_CALL_END') {
+                    if (artifactToolCalls[event.tool_call_id]) {
+                        responseBox.finishTool(event.tool_call_id, artifactToolCalls[event.tool_call_id].args);
+                        logTerminal(`Artifact Completato: ${event.tool_call_id}`);
+                    }
+                    currentToolArgs = "";
+                } else if (event.type === 'RUN_FINISHED') {
+                    if (!accumulatedText && currentToolCalls.length === 0) {
+                        responseBox.updateText("");
+                    }
+                    
+                    let contentArray = [];
+                    if (accumulatedText) {
+                        contentArray.push({ type: "text", text: accumulatedText });
+                    }
+                    if (currentToolCalls.length > 0) {
+                        currentToolCalls.forEach(tc => {
+                            let inputObj = tc.function?.arguments || tc.arguments || {};
+                            if (typeof inputObj === 'string') {
+                                try { inputObj = JSON.parse(inputObj); } catch(e) { inputObj = { text: inputObj }; }
+                            }
+                            contentArray.push({
+                                type: "tool_use",
+                                id: tc.id,
+                                name: tc.function?.name || tc.name,
+                                input: inputObj
+                            });
                         });
                     }
-                    
+                    if (contentArray.length === 0) {
+                        contentArray.push({ type: "text", text: "" });
+                    }
+
                     currentMessages.push({ role: 'assistant', content: contentArray });
                     
-                    const payload = { name: currentChatName, messages: currentMessages, context: {} };
+                    const sanitizedMessages = sanitizeMessagesForApi(currentMessages);
+
+                    const payload = { 
+                        name: currentChatName, 
+                        messages: sanitizedMessages, 
+                        context: { agent_slug: agentSlug } 
+                    };
                     if (currentChatId) {
-                        CatAPI.fetch(`/chats/${currentChatId}`, { method: 'PUT', body: JSON.stringify(payload) }).then(() => loadChatList());
+                        CatAPI.fetch(`/chats/${currentChatId}`, { method: 'PUT', body: JSON.stringify(payload) })
+                            .then(res => { if (res && res.id) currentChatId = res.id; })
+                            .catch(err => console.error("Error updating chat:", err));
                     } else {
-                        CatAPI.fetch('/chats', { method: 'POST', body: JSON.stringify(payload) }).then(res => {
-                            currentChatId = res.id;
-                            loadChatList();
-                        });
+                        CatAPI.fetch('/chats', { method: 'POST', body: JSON.stringify(payload) })
+                            .then(res => {
+                                if (res && res.id) {
+                                    currentChatId = res.id;
+                                    window.history.replaceState(null, '', `#chat?id=${res.id}`);
+                                }
+                                console.log("Nuova chat creata con ID:", currentChatId);
+                            })
+                            .catch(err => console.error("Error creating chat:", err));
                     }
+                    logTerminal(`Risposta completata dall'agente.`);
                 } else if (event.type === 'RUN_ERROR') {
-                    responseBox.updateText(accumulatedText + "\n\n**Error:** " + event.message);
+                    responseBox.updateText((accumulatedText ? accumulatedText + "\n\n" : "") + "**Errore:** " + event.message);
+                    logTerminal(`Errore: ${event.message}`);
                 }
             });
-            if (!accumulatedText && responseBox) responseBox.updateText("Nessuna risposta ricevuta (forse solo uso di tool).");
-        } catch (error) {
-            responseBox.updateText(`**Errore di connessione:** ${error.message}`);
+            if (!accumulatedText && currentToolCalls.length === 0) responseBox.updateText("Nessuna risposta testuale.");
+        } catch (err) {
+            console.error("Errore chat:", err);
+            responseBox.updateText("**Si è verificato un errore di connessione.**");
+            logTerminal(`Errore: ${err.message}`);
         } finally {
-            chatInput.disabled = false;
-            chatInput.focus();
+            if (chatInput) {
+                chatInput.disabled = false;
+                chatInput.focus();
+            }
         }
     }
 
-    // Send Message Logic
-    chatForm.addEventListener('submit', async (e) => {
+    // Terminal Logger helper
+    function logTerminal(line) {
+        if (!terminalOutput) return;
+        const p = document.createElement('p');
+        p.textContent = `> ${line}`;
+        terminalOutput.insertBefore(p, terminalOutput.lastElementChild);
+        terminalOutput.scrollTop = terminalOutput.scrollHeight;
+    }
+
+    // Chat submit handler
+    chatForm?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const text = chatInput.value.trim();
-        if (!text && currentAttachments.length === 0) return;
+        if (!text && currentMessages.length === 0) return;
 
-        let contentArr = [];
         if (text) {
-            contentArr.push({ type: "text", text: text });
+            appendMessage('user', text);
+            currentMessages.push({ role: 'user', content: [{ type: "text", text: text }] });
+            
+            if (currentMessages.length === 1) {
+                currentChatName = (text).substring(0, 30) + (text.length > 30 ? "..." : "");
+            }
         }
         
-        currentAttachments.forEach(att => {
-            // Use local file path if available (so agent's local tools can read it), fallback to URL
-            const fileUri = att.path ? 'file:///' + att.path.replace(/\\/g, '/') : att.url;
-            contentArr.push({ 
-                type: "resource_link", 
-                name: att.original_name || "file",
-                uri: fileUri, 
-                mimeType: att.mime_type || "application/octet-stream" 
-            });
-        });
-
-        // Clear input and attachments
-        const attachmentsCopy = [...currentAttachments]; // Copy for the UI
         chatInput.value = '';
         chatInput.style.height = 'auto';
-        currentAttachments = [];
-        const attachmentsContainer = container.querySelector('#chat-attachments');
-        if (attachmentsContainer) attachmentsContainer.innerHTML = '';
-        
-        chatInput.disabled = true;
-        
-        // Save user message to history
-        currentMessages.push({ role: 'user', content: contentArr });
-        appendMessage('User', text, false, attachmentsCopy);
 
-        if (currentMessages.length === 1) {
-            currentChatName = (text || "Chat con file").substring(0, 30) + (text.length > 30 ? "..." : "");
-        }
-
-        triggerAIResponse();
-    });
-    
-    if (btnCloseCanvas) {
-        btnCloseCanvas.addEventListener('click', () => {
-            canvasPanel.classList.add('hidden');
-            canvasPanel.classList.remove('flex');
-            updateSidebarToggles();
-        });
-    }
-
-    btnCopy.addEventListener('click', () => {
-        const code = editorView.state.doc.toString();
-        navigator.clipboard.writeText(code);
-        btnCopy.innerHTML = '<i data-lucide="check" class="w-3 h-3"></i> Copied';
-        setTimeout(() => {
-            btnCopy.innerHTML = '<i data-lucide="copy" class="w-3 h-3"></i> Copy';
-            if(window.lucide) window.lucide.createIcons();
-        }, 2000);
+        const responseBox = appendMessage('assistant', '');
+        executeAssistantRun(responseBox);
     });
 }
