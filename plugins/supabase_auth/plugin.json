@@ -1,0 +1,8 @@
+{
+  "name": "Supabase Auth",
+  "description": "Supabase JWT verification handler for Stregatto",
+  "author_name": "Gabriele Fuoco",
+  "author_url": "https://github.com/gabrielefuoco/stregatto",
+  "plugin_url": "https://github.com/gabrielefuoco/stregatto",
+  "version": "0.1.0"
+}
