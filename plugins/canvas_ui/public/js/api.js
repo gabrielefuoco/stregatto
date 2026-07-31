@@ -1,11 +1,14 @@
 // api.js - Cheshire Cat REST & SSE API Helper
+import { getSession } from './auth.js';
 const API_BASE = '';
 
 export class CatAPI {
     static async fetch(endpoint, options = {}) {
+        const session = await getSession();
         const url = `${API_BASE}${endpoint}`;
         const headers = {
             'Content-Type': 'application/json',
+            ...(session ? { 'Authorization': `Bearer ${session.access_token}` } : {}),
             ...options.headers
         };
         
@@ -86,8 +89,12 @@ export class CatAPI {
 
     // Send a message and stream the response via SSE
     static async streamMessage(messagesPayload, agentSlug = 'default', onEvent) {
+        const session = await getSession();
         const url = `${API_BASE}/agents/${agentSlug}/message`;
-        const headers = { 'Content-Type': 'application/json' };
+        const headers = { 
+            'Content-Type': 'application/json',
+            ...(session ? { 'Authorization': `Bearer ${session.access_token}` } : {})
+        };
         
         const messages = Array.isArray(messagesPayload)
             ? messagesPayload

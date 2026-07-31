@@ -1,5 +1,6 @@
 // router.js - App Navigation & Route Handler
 import { CatAPI } from './api.js';
+import { getSession } from './auth.js';
 
 const CACHE_BUSTER = '?v=' + new Date().getTime();
 
@@ -11,6 +12,7 @@ const appContainer = document.getElementById('app-container');
 
 // Map hashes to route definitions
 const routes = {
+    '#login': { module: './view_login.js', func: 'renderLoginView' },
     '#chat': { module: './view_chat.js', func: 'renderChatView' },
     '#agents': { module: './view_agents.js', func: 'renderAgentsView' },
     '#history': { module: './view_history.js', func: 'renderHistoryView' },
@@ -52,8 +54,29 @@ async function handleRoute() {
     let rawHash = window.location.hash || '#chat';
     let baseHash = rawHash.split('?')[0];
 
-    if (!routes[baseHash]) {
+    const session = await getSession();
+    const leftSidebar = document.getElementById('left-sidebar');
+
+    if (!session && baseHash !== '#login') {
+        window.location.hash = '#login';
+        return;
+    }
+
+    if (session && baseHash === '#login') {
         window.location.hash = '#chat';
+        return;
+    }
+
+    if (leftSidebar) {
+        if (!session) {
+            leftSidebar.classList.add('!hidden'); // Hide sidebar on login page
+        } else {
+            leftSidebar.classList.remove('!hidden');
+        }
+    }
+
+    if (!routes[baseHash]) {
+        window.location.hash = session ? '#chat' : '#login';
         return;
     }
 

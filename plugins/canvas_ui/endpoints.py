@@ -12,6 +12,14 @@ async def canvas_index() -> HTMLResponse:
         raise HTTPException(status_code=404, detail="Canvas UI not found")
     return FileResponse(path=index_path)
 
+@endpoint.get("/canvas/config", include_in_schema=False)
+async def canvas_config():
+    """Ritorna le chiavi pubbliche di Supabase per la UI."""
+    return {
+        "SUPABASE_URL": os.getenv("SUPABASE_URL", ""),
+        "SUPABASE_ANON_KEY": os.getenv("SUPABASE_ANON_KEY", "")
+    }
+
 @endpoint.get("/canvas/assets/{path:path}", include_in_schema=False)
 async def canvas_assets(path: str) -> HTMLResponse:
     assets_path = os.path.abspath(
