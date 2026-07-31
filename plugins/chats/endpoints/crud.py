@@ -6,24 +6,23 @@ the `role="authenticated"` sugar and reads the current user ambiently via
 """
 
 import json
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Any
 
 from fastapi import Body, Query, HTTPException
 
 from cat import endpoint, user
-from cat.types import Message
 
 from ..db import ChatDB
 from ..utils.schemas import Page, CRUDSelect, CRUDUpdate
 
 
 class ChatCreateUpdate(CRUDUpdate):
-    messages: List[Message] = []
+    messages: List[Any] = []
     context: Dict = {}
 
 
 class ChatSelect(CRUDSelect):
-    messages: List[Message]
+    messages: List[Any]
     context: Dict
 
 

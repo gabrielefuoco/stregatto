@@ -11,17 +11,24 @@ class DocumentReaderDirective(Directive):
     description = "Allows the agent to read various document formats (PDF, DOCX, XLSX, etc.) with pagination and caching."
 
     async def start(self, agent: Agent) -> None:
+        from cat import config
         
         @tool
-        def read_document(file_path: str, start_line: int = 1, end_line: int = 500) -> str:
+        async def read_document(file_path: str, start_line: int = 1, end_line: int = 500) -> str:
             """
             Extracts and reads the text content from a file (PDF, Word, Excel, PowerPoint, Text, HTML) and returns it as structured Markdown.
             You can paginate through large files by specifying `start_line` and `end_line` (default reads the first 500 lines).
-            CRITICAL INSTRUCTION: If the user asks you to read, summarize, or extract text from an uploaded file, ALWAYS use this tool.
+            CRITICAL INSTRUCTION: If the user asks you to read, summarize, or extract text from an uploaded file, ALWAYS use this tool with the file_path provided.
             CRITICAL INSTRUCTION: If the file is a CSV or Excel spreadsheet and the user asks you to perform complex statistical calculations, math, or data manipulation, DO NOT use this tool. Instead, write and execute a Python script using the `run_python_code` tool (with pandas) for precise calculation.
             """
+            # Resolve HTTP upload URLs to physical local disk paths if passed
+            if file_path.startswith("http://") or file_path.startswith("https://") or "uploads/" in file_path:
+                if "/uploads/" in file_path:
+                    relative_path = file_path.split("/uploads/", 1)[1]
+                    file_path = os.path.join(config.UPLOADS_PATH, relative_path)
+
             if not os.path.exists(file_path):
-                return f"Error: The file {file_path} does not exist."
+                return f"Error: The file {file_path} does not exist at '{file_path}'."
             
             # Ensure proper line constraints
             start_line = max(1, start_line)

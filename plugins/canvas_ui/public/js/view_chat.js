@@ -65,6 +65,7 @@ export async function renderChatView() {
 
                 <!-- Input Area -->
                 <div class="w-full max-w-4xl mx-auto px-lg pb-md pt-xs shrink-0">
+                    <div id="file-attachments-preview" class="flex flex-wrap gap-xs mb-xs empty:hidden"></div>
                     <form id="chat-form" class="relative flex items-end bg-surface-container-lowest border-2 border-on-surface shadow-[4px_4px_0px_0px_#ff5f1f] focus-within:shadow-[4px_4px_0px_0px_#1a1c1c] transition-all p-sm mb-xs">
                         
                         <!-- Upload File Button -->
@@ -253,8 +254,41 @@ function initChatLogic(container) {
                         const role = msg.role || 'assistant';
                         
                         if (role === 'user') {
-                            const text = extractTextFromContent(msg.content);
-                            appendMessage('user', text || "");
+                            let text = '';
+                            let attachments = [];
+
+                            if (Array.isArray(msg.content)) {
+                                msg.content.forEach(c => {
+                                    if (!c) return;
+                                    if (c.type === 'text') {
+                                        let t = c.text || '';
+                                        const match = t.match(/^\[File Allegato:\s*"([^"]+)"\s*\([^)]+\)\]\s*/);
+                                        if (match) {
+                                            const fname = match[1];
+                                            if (!attachments.some(a => a.name === fname)) {
+                                                attachments.push({ name: fname });
+                                            }
+                                            t = t.replace(/^\[File Allegato:[^\]]+\]\s*/, '');
+                                        }
+                                        if (t) text += (text ? '\n' : '') + t;
+                                    } else if (c.type === 'file' || c.type === 'image') {
+                                        attachments.push({
+                                            name: c.name || c.file_name || 'allegato',
+                                            url: c.file_url || c.url || '',
+                                            path: c.path || c.file_path || ''
+                                        });
+                                    }
+                                });
+                            } else {
+                                let raw = extractTextFromContent(msg.content);
+                                const match = raw.match(/^\[File Allegato:\s*"([^"]+)"\s*\([^)]+\)\]\s*/);
+                                if (match) {
+                                    attachments.push({ name: match[1] });
+                                    raw = raw.replace(/^\[File Allegato:[^\]]+\]\s*/, '');
+                                }
+                                text = raw;
+                            }
+                            appendMessage('user', text || "", attachments);
                         } else {
                             const msgBox = appendMessage('assistant', "");
 
@@ -384,6 +418,28 @@ function initChatLogic(container) {
         chatInput.style.height = `${Math.min(chatInput.scrollHeight, 180)}px`;
     });
     
+    let pendingUploads = [];
+
+    function renderAttachmentPreviews() {
+        const previewContainer = container.querySelector('#file-attachments-preview');
+        if (!previewContainer) return;
+        previewContainer.innerHTML = '';
+        pendingUploads.forEach((file, index) => {
+            const chip = document.createElement('div');
+            chip.className = 'inline-flex items-center gap-xs px-2 py-1 bg-surface-container-lowest border-2 border-on-surface text-xs font-mono font-bold shadow-[2px_2px_0px_0px_#ff5f1f]';
+            chip.innerHTML = `
+                <span class="material-symbols-outlined text-sm">attach_file</span>
+                <span class="truncate max-w-[200px]">${file.name}</span>
+                <button type="button" class="btn-remove-attach hover:text-red-500 font-bold ml-1 text-sm">&times;</button>
+            `;
+            chip.querySelector('.btn-remove-attach').addEventListener('click', () => {
+                pendingUploads.splice(index, 1);
+                renderAttachmentPreviews();
+            });
+            previewContainer.appendChild(chip);
+        });
+    }
+
     // File upload logic
     const btnUpload = container.querySelector('#btn-upload');
     const fileUploadInput = container.querySelector('#file-upload-input');
@@ -401,14 +457,9 @@ function initChatLogic(container) {
             try {
                 const res = await CatAPI.uploadFile(file);
                 if (res && res.url) {
-                    logTerminal(`File caricato: ${res.url}`);
-                    // Add the file as a system context message or inject to chat
-                    currentMessages.push({ role: 'user', content: [{ type: "file", file_url: res.url }] });
-                    appendMessage('user', `📄 [File allegato: ${file.name}]`);
-                    
-                    if (!currentChatId && currentMessages.length === 1) {
-                        currentChatName = `Chat con file ${file.name}`;
-                    }
+                    logTerminal(`File caricato con successo: ${res.url}`);
+                    pendingUploads.push({ name: file.name, url: res.url, path: res.path });
+                    renderAttachmentPreviews();
                 }
             } catch (err) {
                 logTerminal(`Errore caricamento file: ${err.message}`);
@@ -422,7 +473,13 @@ function initChatLogic(container) {
     chatInput?.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
-            chatForm.dispatchEvent(new Event('submit'));
+            if (chatForm) {
+                if (typeof chatForm.requestSubmit === 'function') {
+                    chatForm.requestSubmit();
+                } else {
+                    chatForm.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+                }
+            }
         }
     });
 
@@ -441,7 +498,7 @@ function initChatLogic(container) {
     }
 
     // Helper: Append message to chat container (Delicate Timeline Layout)
-    function appendMessage(role, text) {
+    function appendMessage(role, text, attachments = []) {
         if (emptyState) emptyState.remove();
 
         const isUser = role === 'user';
@@ -453,9 +510,26 @@ function initChatLogic(container) {
             const userCard = document.createElement('div');
             userCard.className = 'max-w-[80%] bg-surface-container-lowest border-2 border-on-surface p-md shadow-[4px_4px_0px_0px_#1a1c1c] text-on-surface font-body-md flex flex-col gap-xs relative group';
 
-            const contentDiv = document.createElement('div');
-            contentDiv.className = 'font-medium text-sm leading-relaxed whitespace-pre-wrap text-on-surface';
-            contentDiv.textContent = text;
+            if (attachments && attachments.length > 0) {
+                const attachDiv = document.createElement('div');
+                attachDiv.className = 'flex flex-wrap gap-xs mb-xs';
+                attachments.forEach(file => {
+                    attachDiv.innerHTML += `
+                        <div class="inline-flex items-center gap-xs px-2 py-1 bg-surface border border-on-surface text-xs font-mono font-bold shadow-[2px_2px_0px_0px_#1a1c1c]">
+                            <span class="material-symbols-outlined text-sm">attach_file</span>
+                            <span class="truncate max-w-[200px]">${file.name}</span>
+                        </div>
+                    `;
+                });
+                userCard.appendChild(attachDiv);
+            }
+
+            if (text) {
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'font-medium text-sm leading-relaxed whitespace-pre-wrap text-on-surface';
+                contentDiv.textContent = text;
+                userCard.appendChild(contentDiv);
+            }
 
             const actionsDiv = document.createElement('div');
             actionsDiv.className = 'mt-xs flex justify-end gap-xs opacity-60 hover:opacity-100 transition-opacity';
@@ -474,7 +548,6 @@ function initChatLogic(container) {
                 }, 1500);
             });
 
-            userCard.appendChild(contentDiv);
             userCard.appendChild(actionsDiv);
             msgBox.appendChild(userCard);
         } else {
@@ -779,6 +852,30 @@ function initChatLogic(container) {
         executeAssistantRun(responseBox);
     }
 
+    async function saveCurrentChat(agentSlug) {
+        if (currentMessages.length === 0) return;
+        const payload = { 
+            name: currentChatName, 
+            messages: currentMessages, 
+            context: { agent_slug: agentSlug } 
+        };
+        try {
+            if (currentChatId) {
+                const res = await CatAPI.fetch(`/chats/${currentChatId}`, { method: 'PUT', body: JSON.stringify(payload) });
+                if (res && res.id) currentChatId = res.id;
+            } else {
+                const res = await CatAPI.fetch('/chats', { method: 'POST', body: JSON.stringify(payload) });
+                if (res && res.id) {
+                    currentChatId = res.id;
+                    window.history.replaceState(null, '', `#chat?id=${res.id}`);
+                }
+            }
+            logTerminal(`Chat salvata (ID: ${currentChatId})`);
+        } catch (err) {
+            console.error("Error saving chat:", err);
+        }
+    }
+
     // Helper: Execute LLM run streaming
     async function executeAssistantRun(responseBox) {
         if (!responseBox) {
@@ -797,13 +894,18 @@ function initChatLogic(container) {
             let currentToolCalls = [];
             
             const sanitizeMessagesForApi = (messages) => {
-                let cleanMessages = messages.map(m => {
+                let cleanMessages = [];
+                messages.forEach(m => {
                     let cleanContent = [];
                     if (Array.isArray(m.content)) {
                         m.content.forEach(c => {
                             if (!c) return;
-                            if (c.type === 'text' || c.type === 'file' || c.type === 'image') {
+                            if (c.type === 'text') {
                                 cleanContent.push(c);
+                            } else if (c.type === 'file' || c.type === 'image') {
+                                const filePath = c.path || c.file_path || c.file_url || c.url || '';
+                                const fileName = c.name || c.file_name || 'allegato';
+                                cleanContent.push({ type: 'text', text: `[File Allegato: "${fileName}" (Percorso file: "${filePath}")]` });
                             } else if (c.type === 'tool_use' || c.type === 'tool_call') {
                                 cleanContent.push(c);
                             }
@@ -814,10 +916,13 @@ function initChatLogic(container) {
                     if (cleanContent.length === 0) {
                         cleanContent.push({ type: 'text', text: '' });
                     }
-                    return {
-                        role: m.role || 'user',
-                        content: cleanContent
-                    };
+                    
+                    const role = m.role || 'user';
+                    if (role === 'user' && cleanMessages.length > 0 && cleanMessages[cleanMessages.length - 1].role === 'user') {
+                        cleanMessages[cleanMessages.length - 1].content.push(...cleanContent);
+                    } else {
+                        cleanMessages.push({ role: role, content: cleanContent });
+                    }
                 });
 
                 // Guarantee LLM payload never ends with an assistant message
@@ -866,55 +971,9 @@ function initChatLogic(container) {
                     }
                     currentToolArgs = "";
                 } else if (event.type === 'RUN_FINISHED') {
-                    if (!accumulatedText && currentToolCalls.length === 0) {
-                        responseBox.updateText("");
-                    }
-                    
-                    let contentArray = [];
-                    if (accumulatedText) {
-                        contentArray.push({ type: "text", text: accumulatedText });
-                    }
-                    if (currentToolCalls.length > 0) {
-                        currentToolCalls.forEach(tc => {
-                            let inputObj = tc.function?.arguments || tc.arguments || {};
-                            if (typeof inputObj === 'string') {
-                                try { inputObj = JSON.parse(inputObj); } catch(e) { inputObj = { text: inputObj }; }
-                            }
-                            contentArray.push({
-                                type: "tool_use",
-                                id: tc.id,
-                                name: tc.function?.name || tc.name,
-                                input: inputObj
-                            });
-                        });
-                    }
-                    if (contentArray.length === 0) {
-                        contentArray.push({ type: "text", text: "" });
-                    }
-
-                    currentMessages.push({ role: 'assistant', content: contentArray });
-                    
-                    const sanitizedMessages = sanitizeMessagesForApi(currentMessages);
-
-                    const payload = { 
-                        name: currentChatName, 
-                        messages: sanitizedMessages, 
-                        context: { agent_slug: agentSlug } 
-                    };
-                    if (currentChatId) {
-                        CatAPI.fetch(`/chats/${currentChatId}`, { method: 'PUT', body: JSON.stringify(payload) })
-                            .then(res => { if (res && res.id) currentChatId = res.id; })
-                            .catch(err => console.error("Error updating chat:", err));
-                    } else {
-                        CatAPI.fetch('/chats', { method: 'POST', body: JSON.stringify(payload) })
-                            .then(res => {
-                                if (res && res.id) {
-                                    currentChatId = res.id;
-                                    window.history.replaceState(null, '', `#chat?id=${res.id}`);
-                                }
-                                console.log("Nuova chat creata con ID:", currentChatId);
-                            })
-                            .catch(err => console.error("Error creating chat:", err));
+                    if (!accumulatedText && event.result && event.result.output) {
+                        accumulatedText = event.result.output;
+                        responseBox.appendStepText(accumulatedText);
                     }
                     logTerminal(`Risposta completata dall'agente.`);
                 } else if (event.type === 'RUN_ERROR') {
@@ -922,7 +981,32 @@ function initChatLogic(container) {
                     logTerminal(`Errore: ${event.message}`);
                 }
             });
-            if (!accumulatedText && currentToolCalls.length === 0) responseBox.updateText("Nessuna risposta testuale.");
+
+            let contentArray = [];
+            if (accumulatedText) {
+                contentArray.push({ type: "text", text: accumulatedText });
+            }
+            if (currentToolCalls.length > 0) {
+                currentToolCalls.forEach(tc => {
+                    let inputObj = tc.function?.arguments || tc.arguments || {};
+                    if (typeof inputObj === 'string') {
+                        try { inputObj = JSON.parse(inputObj); } catch(e) { inputObj = { text: inputObj }; }
+                    }
+                    contentArray.push({
+                        type: "tool_use",
+                        id: tc.id,
+                        name: tc.function?.name || tc.name,
+                        input: inputObj
+                    });
+                });
+            }
+            if (contentArray.length === 0) {
+                contentArray.push({ type: "text", text: "" });
+            }
+
+            currentMessages.push({ role: 'assistant', content: contentArray });
+            await saveCurrentChat(agentSlug);
+
         } catch (err) {
             console.error("Errore chat:", err);
             responseBox.updateText("**Si è verificato un errore di connessione.**");
@@ -948,19 +1032,34 @@ function initChatLogic(container) {
     chatForm?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const text = chatInput.value.trim();
-        if (!text && currentMessages.length === 0) return;
+        if (!text && pendingUploads.length === 0 && currentMessages.length === 0) return;
+
+        let contentArray = [];
+        const attachmentsCopy = [...pendingUploads];
+
+        if (attachmentsCopy.length > 0) {
+            attachmentsCopy.forEach(file => {
+                contentArray.push({ type: 'file', file_url: file.url, path: file.path, name: file.name });
+            });
+        }
 
         if (text) {
-            appendMessage('user', text);
-            currentMessages.push({ role: 'user', content: [{ type: "text", text: text }] });
-            
-            if (currentMessages.length === 1) {
-                currentChatName = (text).substring(0, 30) + (text.length > 30 ? "..." : "");
-            }
+            contentArray.push({ type: 'text', text: text });
+        }
+
+        if (contentArray.length === 0) return;
+
+        appendMessage('user', text || '', attachmentsCopy);
+        currentMessages.push({ role: 'user', content: contentArray });
+        
+        if (currentMessages.length === 1) {
+            currentChatName = text ? (text.substring(0, 30) + (text.length > 30 ? "..." : "")) : (attachmentsCopy[0]?.name || "Nuova Chat");
         }
         
         chatInput.value = '';
         chatInput.style.height = 'auto';
+        pendingUploads = [];
+        renderAttachmentPreviews();
 
         const responseBox = appendMessage('assistant', '');
         executeAssistantRun(responseBox);
