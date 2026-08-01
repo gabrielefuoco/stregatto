@@ -13,6 +13,7 @@ const appContainer = document.getElementById('app-container');
 // Map hashes to route definitions
 const routes = {
     '#login': { module: './view_login.js', func: 'renderLoginView' },
+    '#register': { module: './view_register.js', func: 'renderRegisterView' },
     '#chat': { module: './view_chat.js', func: 'renderChatView' },
     '#agents': { module: './view_agents.js', func: 'renderAgentsView' },
     '#history': { module: './view_history.js', func: 'renderHistoryView' },
@@ -57,21 +58,23 @@ async function handleRoute() {
     const session = await getSession();
     const leftSidebar = document.getElementById('left-sidebar');
 
-    if (!session && baseHash !== '#login') {
+    const isPublicRoute = (baseHash === '#login' || baseHash === '#register');
+
+    if (!session && !isPublicRoute) {
         window.location.hash = '#login';
         return;
     }
 
-    if (session && baseHash === '#login') {
+    if (session && isPublicRoute) {
         window.location.hash = '#chat';
         return;
     }
 
     if (leftSidebar) {
         if (!session) {
-            leftSidebar.classList.add('!hidden'); // Hide sidebar on login page
+            leftSidebar.style.display = 'none'; // Hide sidebar on login page
         } else {
-            leftSidebar.classList.remove('!hidden');
+            leftSidebar.style.display = '';
         }
     }
 
@@ -100,16 +103,23 @@ async function handleRoute() {
         const module = await importView(routeDef.module);
         const renderFunc = module[routeDef.func];
         const viewElement = await renderFunc();
-        appContainer.appendChild(viewElement);
+        
+        // Anti-race-condition: check if hash changed while we were fetching/rendering
+        if (window.location.hash.split('?')[0] === baseHash) {
+            appContainer.innerHTML = '';
+            appContainer.appendChild(viewElement);
+        }
     } catch (e) {
         console.error("Router error:", e);
-        appContainer.innerHTML = `
-            <div class="p-lg text-error font-mono text-sm border-2 border-on-surface m-lg bg-surface-container-lowest shadow-hard">
-                <h1 class="font-headline-md font-bold mb-sm">Errore Frontend</h1>
-                <p>${e.message}</p>
-                <pre class="mt-md p-sm bg-surface-container overflow-x-auto">${e.stack}</pre>
-            </div>
-        `;
+        if (window.location.hash.split('?')[0] === baseHash) {
+            appContainer.innerHTML = `
+                <div class="p-lg text-error font-mono text-sm border-2 border-on-surface m-lg bg-surface-container-lowest shadow-hard">
+                    <h1 class="font-headline-md font-bold mb-sm">Errore Frontend</h1>
+                    <p>${e.message}</p>
+                    <pre class="mt-md p-sm bg-surface-container overflow-x-auto">${e.stack}</pre>
+                </div>
+            `;
+        }
     }
 
     // Refresh recent sidebar chats list
@@ -201,12 +211,23 @@ function setupGlobalHandlers() {
     }
 }
 
-function initApp() {
-    setupGlobalHandlers();
+export function initApp() {
+    window.addEventListener('hashchange', handleRoute);
     handleRoute();
+
+    // Setup Logout Button
+    const logoutBtn = document.getElementById('btn-logout');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async () => {
+            const { signOut } = await import('./auth.js');
+            await signOut();
+            // AuthStateChange listener handles redirection
+        });
+    }
+
+    setupGlobalHandlers();
 }
 
-window.addEventListener('hashchange', handleRoute);
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initApp);
 } else {

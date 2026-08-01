@@ -15,9 +15,11 @@ async def canvas_index() -> HTMLResponse:
 @endpoint.get("/canvas/config", include_in_schema=False)
 async def canvas_config():
     """Ritorna le chiavi pubbliche di Supabase per la UI."""
+    from dotenv import dotenv_values
+    env = dotenv_values(".env")
     return {
-        "SUPABASE_URL": os.getenv("SUPABASE_URL", ""),
-        "SUPABASE_ANON_KEY": os.getenv("SUPABASE_ANON_KEY", "")
+        "SUPABASE_URL": env.get("SUPABASE_URL", ""),
+        "SUPABASE_ANON_KEY": env.get("SUPABASE_ANON_KEY", "")
     }
 
 @endpoint.get("/canvas/assets/{path:path}", include_in_schema=False)

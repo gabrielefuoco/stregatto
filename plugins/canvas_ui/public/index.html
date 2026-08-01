@@ -121,7 +121,7 @@
 </head>
 <body class="h-full bg-surface-container font-body-md text-on-surface flex flex-col md:flex-row overflow-hidden antialiased">
     <!-- Desktop Left Sidebar -->
-    <aside id="left-sidebar" class="hidden md:flex flex-col h-screen sidebar-transition border-r-2 border-on-surface bg-surface-container-lowest p-md shrink-0 relative z-20 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1)] sidebar-expanded">
+    <aside id="left-sidebar" style="display: none;" class="hidden md:flex flex-col h-screen sidebar-transition border-r-2 border-on-surface bg-surface-container-lowest p-md shrink-0 relative z-20 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1)] sidebar-expanded">
         <!-- Header Profile / Brand -->
         <div class="flex items-center justify-between mb-xl">
             <div class="flex items-center gap-md p-xs overflow-hidden">
@@ -174,6 +174,11 @@
                     <span class="material-symbols-outlined shrink-0">settings</span>
                     <span class="font-headline-md text-[18px] sidebar-text">Settings</span>
                 </a>
+
+                <button id="btn-logout" class="nav-link flex items-center gap-md px-md py-sm w-full text-left text-on-surface-variant hover:bg-error-container hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] border-2 border-transparent hover:border-error hover:text-on-error-container transition-all" title="Logout">
+                    <span class="material-symbols-outlined shrink-0">logout</span>
+                    <span class="font-headline-md text-[18px] sidebar-text">Logout</span>
+                </button>
             </div>
         </nav>
         <div id="left-sidebar-resizer" class="hidden md:block absolute top-0 -right-1 w-2 h-full cursor-col-resize hover:bg-primary/50 active:bg-primary z-30 select-none"></div>
@@ -185,7 +190,7 @@
     </main>
 
     <!-- App Router -->
-    <script type="module" src="/canvas/assets/js/router.js"></script>
+    <script type="module" src="/canvas/assets/js/router.js?v=2"></script>
 </body>
 </html>
 

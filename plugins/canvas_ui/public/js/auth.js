@@ -26,6 +26,21 @@ export async function signIn(email, password) {
     return supabase.auth.signInWithPassword({ email, password });
 }
 
+export async function signUp(email, password) {
+    if (!supabase) throw new Error("Supabase non inizializzato");
+    return supabase.auth.signUp({ email, password });
+}
+
+export async function signInWithGoogle() {
+    if (!supabase) throw new Error("Supabase non inizializzato");
+    return supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+            redirectTo: window.location.origin + '/canvas'
+        }
+    });
+}
+
 export async function signOut() {
     if (!supabase) return;
     return supabase.auth.signOut();
