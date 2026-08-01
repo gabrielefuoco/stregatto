@@ -2173,12 +2173,14 @@ name = "stregatto"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "asyncpg" },
     { name = "cheshire-cat-ai" },
     { name = "markitdown" },
 ]
 
 [package.metadata]
 requires-dist = [
+    { name = "asyncpg", specifier = ">=0.31.0" },
     { name = "cheshire-cat-ai", specifier = ">=2.0.23" },
     { name = "markitdown", specifier = ">=0.1.6" },
 ]

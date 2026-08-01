@@ -12,7 +12,6 @@ from fastmcp.mcp_config import RemoteMCPServer, StdioMCPServer
 
 AuthType = Literal["none", "apikey", "oauth2"]
 
-
 class MCPServer(BaseModel):
     """A single MCP server the Cat connects to as a stateless client."""
 

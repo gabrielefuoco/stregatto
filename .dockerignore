@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.pyc
+core.db
+.env
+build/
+dist/
+StregattoEdgeInstaller.spec
+StregattoEdgeInstaller_Tailscale.spec
+node_modules/
+todo/
+.git/

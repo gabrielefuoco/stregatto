@@ -3,6 +3,7 @@ name = "stregatto"
 version = "0.1.0"
 requires-python = ">=3.13"
 dependencies = [
+    "asyncpg>=0.31.0",
     "cheshire-cat-ai>=2.0.23",
     "markitdown>=0.1.6",
 ]

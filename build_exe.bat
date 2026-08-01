@@ -1,0 +1,6 @@
+@echo off
+echo Installazione di PyInstaller...
+uv pip install pyinstaller
+echo Compilazione di stregatto_installer.py in eseguibile standalone...
+.\.venv\Scripts\pyinstaller.exe --onefile --console --icon=NONE --name=StregattoEdgeInstaller stregatto_installer.py
+echo Fatto! L'eseguibile si trova nella cartella 'dist'.

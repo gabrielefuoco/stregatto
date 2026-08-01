@@ -13,6 +13,14 @@ async def frontend_index() -> HTMLResponse:
     )
     return FileResponse(path=index_path)
 
+@endpoint.get("/sw.js", include_in_schema=False)
+async def frontend_sw() -> FileResponse:
+    sw_path = os.path.abspath(
+        os.path.join(plugin.path, "dist/sw.js")
+    )
+    if os.path.isfile(sw_path):
+        return FileResponse(path=sw_path, media_type="application/javascript")
+    raise HTTPException(status_code=404, detail="Service worker not found")
 
 @endpoint.get("/assets/{path:path}", include_in_schema=False)
 async def frontend_assets(path: str) -> HTMLResponse:

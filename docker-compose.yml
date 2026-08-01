@@ -1,0 +1,11 @@
+services:
+  stregatto-cloud:
+    build: .
+    container_name: stregatto-cloud
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    env_file:
+      - .env
+    # Usiamo la rete di default. Dato che Tailscale gira sull'host, 
+    # Docker route nativamente gli IP 100.x.x.x attraverso il bridge dell'host.
