@@ -36,7 +36,7 @@ class MCPServer(BaseModel):
             import shutil
             import os
             from dotenv import load_dotenv
-            load_dotenv()
+            load_dotenv(override=True)
             env = dict(os.environ)
             env["PYTHONUTF8"] = "1"  # Force UTF-8 for Python MCP servers to avoid UnicodeDecodeError
             cmd = shutil.which(self.command) or self.command
@@ -67,10 +67,20 @@ def build_client(server: MCPServer) -> Client:
     return Client(server.to_remote().to_transport())
 
 
+def get_default_servers() -> List[MCPServer]:
+    return [
+        MCPServer(
+            name="notion",
+            description="Official Notion MCP Server. Usalo per leggere e cercare documenti nel workspace Notion dell'utente.",
+            command="npx",
+            args=["-y", "@notionhq/notion-mcp-server"]
+        )
+    ]
+
 class Settings(BaseModel):
     """Typed settings for the MCP directive: the servers to attach."""
 
     servers: List[MCPServer] = Field(
-        default_factory=list,
+        default_factory=get_default_servers,
         description="MCP servers whose tools this directive adds to an agent.",
     )

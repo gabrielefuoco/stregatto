@@ -1,0 +1,5 @@
+{
+  "name": "FSMemory",
+  "description": "Hybrid memory system: Tool Cache on Filesystem and Chat History sliding window/search on Supabase.",
+  "version": "1.0.0"
+}

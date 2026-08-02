@@ -5,7 +5,7 @@ class WorkspaceAgent(Agent):
     slug = "workspace"
     name = "Workspace Agent"
     description = "A versatile assistant capable of file management, python code execution, web search, and MCP integrations."
-    directives = ["skills", "clock", "todo_memory", "isolated_memory", "desktop_commander", "tavily", "google_workspace", "context7", "fetch", "github", "python_interpreter", "document_reader", "artifacts", "sandbox"]
+    directives = ["skills", "clock", "todo_memory", "isolated_memory", "desktop_commander", "tavily", "google_workspace", "context7", "fetch", "github", "python_interpreter", "document_reader", "artifacts", "sandbox", "fs_memory"]
 
     system_prompt = (
         "Sei l'Agente Stregatto, un assistente avanzato progettato per operare in un ambiente ibrido (Cloud + Edge).\n"

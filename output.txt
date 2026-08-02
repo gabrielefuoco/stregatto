@@ -1,0 +1,122 @@
+Title: Live Content
+
+Description: Fetched live
+
+Source: https://developers.notion.com/guides/mcp/overview
+
+---
+Notion MCP - Notion Docs
+Documentation Index
+Fetch the complete documentation index at:
+/llms.txt
+Use this file to discover all available pages before exploring further.
+Skip to main content
+Notion Docs
+home page
+Search...
+⌘
+K
+Ask Assistant
+Log in
+Developer portal
+Developer portal
+Search...
+Navigation
+Notion MCP
+Notion MCP
+Guides
+API Reference
+CLI Reference
+Workers
+Admin API
+Changelog
+Examples
+Get started
+Overview
+Quickstart
+Personal access tokens
+Internal connections
+Public connections
+Authorization
+Handling API keys
+Preparing for users
+List on the Marketplace
+Agent APIs
+Notion MCP
+Overview
+Connecting to Notion MCP
+Supported tools
+Security best practices
+Integrating your own MCP client
+Hosting a local MCP server
+API versions
+Upgrading to 2026-03-11
+Upgrading to 2025-09-03
+Data APIs
+Working with page content
+Working with databases
+Working with views
+Working with comments
+Working with markdown content
+Working with files and media
+Resources
+Example code
+Postman workspace
+Historical changelog
+Compliance
+Overview
+Event reference
+Link previews
+Introduction
+On this page
+What is Notion MCP?
+Why use Notion MCP?
+What can you do with Notion MCP?
+Notion MCP
+Notion MCP
+Copy page
+Copy page
+Learn how to connect AI agents to your Notion workspace.
+Copy page
+Copy page
+Connect your AI tools to Notion using the
+Model Context Protocol (MCP)
+, an open standard that lets AI assistants interact with your Notion workspace.
+​
+What is Notion MCP?
+Notion MCP is our hosted server that gives AI tools secure access to your Notion workspace. It’s designed to work seamlessly with popular AI assistants like Claude Code, Cursor, VS Code, ChatGPT, and more.
+High-level diagram of the MCP data flow, where Notion hosts both the MCP Server and
+Notion's API
+, and your tools contain
+MCP clients
+that connect to the remote MCP server to access our tools.
+​
+Why use Notion MCP?
+Easy setup
+— Connect through simple OAuth, with one-click installation for supported AI tools
+Full workspace access
+— AI tools can read and write to your Notion pages just like you can
+Optimized for AI
+— Built specifically for AI agents with efficient data formatting
+​
+What can you do with Notion MCP?
+Create documentation
+— Generate PRDs, tech specs, and architecture docs from your research and project data
+Search and find answers
+— Let AI search across all your Notion and connected workspace content
+Manage tasks
+— Generate code snippets from task descriptions and update project status automatically
+Build reports
+— Create release notes, project updates, and performance reports from multiple sources
+Plan campaigns
+— Generate comprehensive briefs and track progress across marketing channels
+List on the Marketplace
+Previous
+Connecting to Notion MCP
+Next
+⌘
+I
+x
+slack
+Assistant
+Responses are generated using AI and may contain mistakes.

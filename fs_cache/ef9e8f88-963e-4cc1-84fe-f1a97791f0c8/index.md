@@ -1,0 +1,77 @@
+- [18:23:51] User: [creare, pag, notion, test, attention, Figa, usare, pagina, capitolo] -> Tool: list_mcp_actions -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_FeRL0KVk5.txt
+- [18:26:33] User: [creare, pag, notion, test, attention, Figa, usare, pagina, capitolo] -> Tool: list_mcp_actions -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_Ikwp1ICpu.txt
+- [18:26:37] User: [creare, pag, notion, test, attention, Figa, usare, pagina, capitolo] -> Tool: mcp_tool -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_YlXdJ9ZBm.txt
+- [18:26:38] User: [creare, pag, notion, test, attention, Figa, usare, pagina, capitolo] -> Tool: read_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_171tsEA55.txt
+- [18:26:39] User: [creare, pag, notion, test, attention, Figa, usare, pagina, capitolo] -> Tool: read_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_od6bQgjw0.txt
+- [18:26:40] User: [creare, pag, notion, test, attention, Figa, usare, pagina, capitolo] -> Tool: search_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_DXYoa4kzy.txt
+- [18:26:41] User: [creare, pag, notion, test, attention, Figa, usare, pagina, capitolo] -> Tool: read_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_MqDzoWi19.txt
+- [18:27:21] User: [successo] -> Tool: list_mcp_actions -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_RgqNFfTFt.txt
+- [18:27:22] User: [successo] -> Tool: read_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_Tn8VMg2zQ.txt
+- [18:27:23] User: [successo] -> Tool: read_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_eV4BeyVcs.txt
+- [18:27:53] User: [creare la] -> Tool: list_mcp_actions -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_ixxGWsYip.txt
+- [18:27:54] User: [creare la] -> Tool: read_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_2XJzkALX3.txt
+- [18:28:03] User: [creare la] -> Tool: mcp_tool -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_IPzgz64D0.txt
+- [18:28:04] User: [creare la] -> Tool: read_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_YmqlFnn7S.txt
+- [18:28:31] User: [creala, quick] -> Tool: list_mcp_actions -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_eNrzny5Lj.txt
+- [18:28:33] User: [creala, quick] -> Tool: mcp_tool -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_kUhUNKrvp.txt
+- [18:28:34] User: [creala, quick] -> Tool: search_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_GTStO7cX8.txt
+- [18:28:42] User: [creala, quick] -> Tool: mcp_tool -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_2Rp56i6tB.txt
+- [18:28:45] User: [creala, quick] -> Tool: mcp_tool -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_EDbceRZfv.txt
+- [18:28:46] User: [creala, quick] -> Tool: search_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_bN3uygAl0.txt
+- [18:29:33] User: [creala, genitore] -> Tool: list_mcp_actions -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_P93peLjKE.txt
+- [18:29:39] User: [creala, genitore] -> Tool: mcp_tool -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_yUJfhkzrC.txt
+- [18:29:40] User: [creala, genitore] -> Tool: read_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_SJqKlBgIc.txt
+- [18:29:45] User: [creala, genitore] -> Tool: mcp_tool -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_cSJtIM3MF.txt
+- [18:29:54] User: [link] -> Tool: list_mcp_actions -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_RiR1Uw6VI.txt
+- [18:31:03] User: [popolala, bene, dettaglia, usare, pagina, potenza, notion] -> Tool: list_mcp_actions -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_8Pw8X1qJU.txt
+- [18:31:11] User: [popolala, bene, dettaglia, usare, pagina, potenza, notion] -> Tool: mcp_tool -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_NfxrSkmXs.txt
+- [18:31:12] User: [popolala, bene, dettaglia, usare, pagina, potenza, notion] -> Tool: read_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_YwjPzyffX.txt
+- [18:31:15] User: [popolala, bene, dettaglia, usare, pagina, potenza, notion] -> Tool: read_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_RhS2wSW2Q.txt
+- [18:31:19] User: [popolala, bene, dettaglia, usare, pagina, potenza, notion] -> Tool: read_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_t0u2MKnHO.txt
+- [18:31:20] User: [popolala, bene, dettaglia, usare, pagina, potenza, notion] -> Tool: read_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_TmaeFTVBk.txt
+- [18:31:22] User: [popolala, bene, dettaglia, usare, pagina, potenza, notion] -> Tool: read_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_nsQjhdXZg.txt
+- [18:31:23] User: [popolala, bene, dettaglia, usare, pagina, potenza, notion] -> Tool: read_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_dQtrcmHW8.txt
+- [18:31:24] User: [popolala, bene, dettaglia, usare, pagina, potenza, notion] -> Tool: read_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_ncrl4RTTy.txt
+- [18:31:25] User: [popolala, bene, dettaglia, usare, pagina, potenza, notion] -> Tool: read_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_2mgAjXajH.txt
+- [18:31:27] User: [popolala, bene, dettaglia, usare, pagina, potenza, notion] -> Tool: read_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_Oguga0Cte.txt
+- [18:31:28] User: [popolala, bene, dettaglia, usare, pagina, potenza, notion] -> Tool: read_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_3jfUmPZoI.txt
+- [18:31:30] User: [popolala, bene, dettaglia, usare, pagina, potenza, notion] -> Tool: read_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_KryaTzXFf.txt
+- [18:31:32] User: [popolala, bene, dettaglia, usare, pagina, potenza, notion] -> Tool: read_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_ItgkQhgi5.txt
+- [18:31:33] User: [popolala, bene, dettaglia, usare, pagina, potenza, notion] -> Tool: read_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_GAgBQg2LG.txt
+- [18:31:34] User: [popolala, bene, dettaglia, usare, pagina, potenza, notion] -> Tool: read_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_Y3uD2uPFo.txt
+- [18:31:35] User: [popolala, bene, dettaglia, usare, pagina, potenza, notion] -> Tool: read_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_sIP8z4rW5.txt
+- [18:31:37] User: [popolala, bene, dettaglia, usare, pagina, potenza, notion] -> Tool: read_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_LpCyfmrPT.txt
+- [18:31:38] User: [popolala, bene, dettaglia, usare, pagina, potenza, notion] -> Tool: read_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_JT1U94HbM.txt
+- [18:31:39] User: [popolala, bene, dettaglia, usare, pagina, potenza, notion] -> Tool: read_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_QTmf1nfL0.txt
+- [18:31:40] User: [popolala, bene, dettaglia, usare, pagina, potenza, notion] -> Tool: read_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_306Jn6Imv.txt
+- [18:31:41] User: [popolala, bene, dettaglia, usare, pagina, potenza, notion] -> Tool: read_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_D1e7NJZ8V.txt
+- [18:31:42] User: [popolala, bene, dettaglia, usare, pagina, potenza, notion] -> Tool: read_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_sbYsSUZC7.txt
+- [18:31:44] User: [popolala, bene, dettaglia, usare, pagina, potenza, notion] -> Tool: read_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_23SwSXCfY.txt
+- [18:31:45] User: [popolala, bene, dettaglia, usare, pagina, potenza, notion] -> Tool: read_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_exAMjrCAD.txt
+- [18:31:47] User: [popolala, bene, dettaglia, usare, pagina, potenza, notion] -> Tool: read_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_v3CXXJBiv.txt
+- [18:31:48] User: [popolala, bene, dettaglia, usare, pagina, potenza, notion] -> Tool: read_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_JPliKKuBf.txt
+- [18:31:50] User: [popolala, bene, dettaglia, usare, pagina, potenza, notion] -> Tool: read_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_hN9xDLF7Z.txt
+- [18:31:51] User: [popolala, bene, dettaglia, usare, pagina, potenza, notion] -> Tool: read_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_F07RM2Hrp.txt
+- [18:31:53] User: [popolala, bene, dettaglia, usare, pagina, potenza, notion] -> Tool: search_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_05sYt7JOy.txt
+- [18:31:54] User: [popolala, bene, dettaglia, usare, pagina, potenza, notion] -> Tool: read_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_RWXL6VEWG.txt
+- [18:31:55] User: [popolala, bene, dettaglia, usare, pagina, potenza, notion] -> Tool: search_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_tzwU7ODgR.txt
+- [18:31:57] User: [popolala, bene, dettaglia, usare, pagina, potenza, notion] -> Tool: read_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_7H186XcTx.txt
+- [18:31:58] User: [popolala, bene, dettaglia, usare, pagina, potenza, notion] -> Tool: read_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_SoMjZXZpU.txt
+- [18:31:59] User: [popolala, bene, dettaglia, usare, pagina, potenza, notion] -> Tool: search_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_YOT2YPq9K.txt
+- [18:32:01] User: [popolala, bene, dettaglia, usare, pagina, potenza, notion] -> Tool: read_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_wkalVZQxe.txt
+- [18:32:04] User: [popolala, bene, dettaglia, usare, pagina, potenza, notion] -> Tool: read_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_nasKj3Sc1.txt
+- [18:32:05] User: [popolala, bene, dettaglia, usare, pagina, potenza, notion] -> Tool: read_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_Ccz9TE9so.txt
+- [18:32:07] User: [popolala, bene, dettaglia, usare, pagina, potenza, notion] -> Tool: mcp_tool -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_JyChrSRIq.txt
+- [18:32:08] User: [popolala, bene, dettaglia, usare, pagina, potenza, notion] -> Tool: read_cached_file -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_LCzjj3QlR.txt
+- [18:35:29] User: [creare, pag, notion, test, attention, Figa, usare, pagina, capitolo, usare, tavily, documentare ti, genitore, pag] -> Tool: list_mcp_actions -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_hC7xFjTxc.txt
+- [18:35:33] User: [creare, pag, notion, test, attention, Figa, usare, pagina, capitolo, usare, tavily, documentare ti, genitore, pag] -> Tool: mcp_tool -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_6UiY5H2sM.txt
+- [18:35:36] User: [creare, pag, notion, test, attention, Figa, usare, pagina, capitolo, usare, tavily, documentare ti, genitore, pag] -> Tool: list_mcp_actions -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_3pTA8ia5Y.txt
+- [18:35:40] User: [creare, pag, notion, test, attention, Figa, usare, pagina, capitolo, usare, tavily, documentare ti, genitore, pag] -> Tool: mcp_tool -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_k5dCi8LiO.txt
+- [18:35:52] User: [creala, genitore] -> Tool: list_mcp_actions -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_pUMOxM63q.txt
+- [18:36:45] User: [creala, genitore] -> Tool: mcp_tool -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_oUA5wm31O.txt
+- [18:36:52] User: [creala, genitore] -> Tool: mcp_tool -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_GMVvuGvJN.txt
+- [18:37:22] User: [creala, genitore] -> Tool: mcp_tool -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_wiBinCbuw.txt
+- [18:37:22] User: [creala, genitore] -> Tool: mcp_tool -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_fd1gp3yX2.txt
+- [18:37:22] User: [creala, genitore] -> Tool: mcp_tool -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_sMK4M8vEF.txt
+- [18:37:23] User: [creala, genitore] -> Tool: mcp_tool -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_RgJERCE8f.txt
+- [18:40:07] User: [ok] -> Tool: mcp_tool -> File: C:\Users\gabri\APP\stregatto\fs_cache\ef9e8f88-963e-4cc1-84fe-f1a97791f0c8\call_MbGzYwmmD.txt

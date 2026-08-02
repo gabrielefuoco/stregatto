@@ -1,0 +1,213 @@
+Detailed Results:
+
+Title: Paged Attention: Turning the Page on Transformer Memory | by Sai Saketh
+URL: https://pub.towardsai.net/paged-attention-turning-the-page-on-transformer-memory-f394ca74e230
+Content: ### 3.3 Paged Attention
+
+Paged Attention introduces a different approach to managing attention memory by abandoning the assumption that all Key Value states must be stored in a single contiguous block of memory. Traditional attention implementations rely on contiguous KV storage, which works well when input and output lengths are known and static. However, this approach becomes highly inefficient for LLM inference, where sequence lengths are dynamic and unpredictable.
+
+To address this, Paged Attention partitions the KV cache into fixed-size blocks and virtualizes them into logical and physical views. This design decouples the logical token order from the physical memory layout and enables on-demand memory allocation.
+
+Press enter or click to view image in full size [...] Sitemap
+
+Open in app
+
+Sign in
+
+Sign in
+
+## Towards AI
+
+Towards AI
+
+We build Enterprise AI. We teach what we learn. Join 100K+ AI practitioners on Towards AI Academy. Free: 6-day Agentic AI Engineering Email Guide: 
+
+# Paged Attention: Turning the Page on Transformer Memory
+
+Sai Saketh
+
+Sai Saketh
+
+9 min read
+
+·
+
+Dec 19, 2025
+
+--
+
+## 1. KV Cache and the Hidden Cost of Long-Context LLM Inference [...] Press enter or click to view image in full size
+
+Figure 8: Paged Attention
+
+For example, consider a request with the prompt: “Alan Turing is a computer scientist”.
+
+ The logical KV blocks represent the token sequence in order, with tokens mapped to consecutive logical blocks to preserve their natural order.
+ The Physical KV blocks represent actual memory locations, which may be allocated in any order and are not required to be contiguous.
+ A block table maintains the mapping between logical KV blocks and physical KV blocks, functioning similarly to a page table in an operating system.
+ When the final logical block becomes full, a new physical block is allocated and mapped on demand, rather than being pre-allocated upfront as in traditional systems.
+
+Title: Paged Attention in LLMs
+URL: https://www.dailydoseofds.com/p/paged-attention-in-llms
+Content: This is why vLLM, which implements Paged Attention as its core algorithm, has become the go-to inference engine for production deployments. Other frameworks like TensorRT-LLM and SGLang have also adopted similar paging mechanisms for faster inference.
+
+This optimization becomes even more crucial when running inference servers at scale, especially with variable request patterns, shared prompts, and cost-per-request constraints.
+
+👉 Over to you: What other OS concepts do you think could be applied to optimize LLM inference?
+
+To dive deeper into how LLM systems are deployed, start with the practical and hands-on LLMOps course here →
+
+Thanks for reading!
+
+Published on Mar 11, 2026
+
+Share to X   Share to Facebook   Share to Linkedin [...] If you’ve studied OS fundamentals, you know that programs don’t get one big contiguous chunk of RAM. Instead, the OS breaks memory into small, fixed-size pages, scatters them anywhere in physical memory, and uses a page table to map each program’s virtual addresses to physical locations.
+
+Paged Attention does the same thing for the KV cache. Here’s how:
+
+Block-level allocation: Instead of reserving one large contiguous block per request, the KV cache is divided into small, fixed-size blocks (typically 16 tokens each). These blocks can live anywhere in GPU memory and don’t necessarily need to be next to each other. [...] LLMs
+
+# Paged Attention in LLMs
+
+...explained visually!
+
+Avi Chawla
+
+Avi Chawla
+
+👉
+
+When you’re serving LLMs at scale, memory becomes your bottleneck before compute does.
+
+The problem isn’t a lack of GPU memory; it’s how inefficiently we use it.
+
+Let’s understand why this happens and how Paged Attention solves it elegantly!
+
+#### KV Cache
+
+During LLM inference, the model stores the key and value vectors of all previously generated tokens in memory. This is the KV cache(we covered KV caching in detail here).
+
+Simply put, instead of recomputing attention over all previous tokens every time a new token is generated, the model just looks up the cached values and computes attention with them.
+
+Title: PagedAttention - MLOps Dictionary
+URL: https://www.hopsworks.ai/dictionary/pagedattention
+Content: Reduced memory footprint: By partitioning the KV cache into smaller pages and only loading the necessary pages during inference, PagedAttention can drastically reduce the overall memory requirements of the LLM. This opens up the possibility of deploying and serving these powerful models on hardware with more limited memory resources.
+ Potential for compression: The paged structure of the KV cache also opens up opportunities for further compression techniques. Individual pages could be compressed using various methods, reducing their memory footprint even further without significantly impacting the model's performance. [...] ## How does Paged Attention work?
+
+The core idea behind Paged Attention is to partition the KV cache of each sequence into smaller, more manageable "pages" or blocks. Each block contains key-value vectors for a fixed number of tokens. This way, the KV cache can be loaded and accessed more efficiently during attention computation.
+
+Figure 1: Illustration of how PagedAttention stores the attention key and values vectors as non-contiguous blocks in the memory (from the paper mentioned previously) [...] Attention computation: With the relevant pages loaded, the model can then perform the attention computation as usual, accessing the key-value pairs from the loaded pages as needed.
+
+Title: How PagedAttention resolves memory waste of LLM systems
+URL: https://developers.redhat.com/articles/2025/07/24/how-pagedattention-resolves-memory-waste-llm-systems
+Content: ### Structured outputs in vLLM: Guiding AI responses
+
+### vLLM V1: Accelerating multimodal inference for large language models
+
+### The road to AI: A guide to understanding AI/ML models
+
+## Recent Posts
+
+### Why is pytorch compile so fast?
+
+### The hidden cost of observability sprawl
+
+### Camel integration quarterly digest: Q2 2026
+
+### Optimize OpenShift workloads with software-defined memory
+
+### Why your AI agent needs two sandboxes: Benchmark data
+
+## What’s up next?
+
+This short e-book examines the compelling combination of open source and artificial intelligence (AI), showcasing the benefits of effective open source-licensed models and tools for developers.
+
+Red Hat Developers logo
+
+### Platforms
+
+### Build
+
+### Quicklinks
+
+### Communicate
+
+### RED HAT DEVELOPER [...] Here we have found three types of memory waste: 
+
+External fragmentation happens when KV caches require large contiguous blocks but leave behind scattered gaps, preventing efficient reuse of total GPU memory (Figure 1). 
+
+memory fragmentation
+
+Image source: [Efficient Memory Management for Large Language Model Serving with PagedAttention]
+
+## PagedAttention
+
+How does PagedAttentionsolve this problem? PagedAttention in vLLM mainly solves external fragmentation Here the large kv cache is divided into block of pages(kv blocks) and here we avoid preallocation the contiguous memory as a result the chance of memory wastage becomes less. Also here the memory need not to be allocated in contiguous fashion.
+
+vLLM used the concept of virtual memory and paging in OS. [...] This design helps in several ways:
+
+Say for example the model has generated a new token `renowned` the new token will be first appended to the last logical block and using the block table the respective token will be stored in the physical kv blocks (Figure 2).
+
+`renowned`
+
+In short we are allocating memory on demand instead of pre-allocating a big chunk.
+
+Here, we only have minimal internal fragmentation. There will be no external fragmentation since we will have same block size.
+
+## Final thoughts
+
+Title: Paged Attention
+URL: https://docs.vllm.ai/en/latest/design/paged_attention
+Content: You are viewing the latest developer preview docs. Click here to view docs for the latest stable release.
+
+logo
+logo
+
+# Paged Attention¶
+
+Warning
+
+This is a historical document based on the original paper for vLLM. It no longer describes the code used in vLLM today.
+
+Currently, vLLM utilizes its own implementation of a multi-head query attention kernel (`csrc/attention/attention_kernels.cu`). This kernel is designed to be compatible with vLLM's paged KV caches, where the key and value cache are stored in separate blocks (note that this block concept differs from the GPU thread block. So in a later document, I will refer to vLLM paged attention block as "block", while refer to GPU thread block as "thread block").
+
+`csrc/attention/attention_kernels.cu` [...] `q`
+`k_cache`
+`v_cache`
+`out`
+`template<typename scalar_t, int HEAD_SIZE, int BLOCK_SIZE, int NUM_THREADS, int PARTITION_SIZE = 0>
+__device__ void paged_attention_kernel(
+ ... // Other side args.
+ const scalar_t __restrict__ out, // [num_seqs, num_heads, max_num_partitions, head_size]
+ const scalar_t __restrict__ q, // [num_seqs, num_heads, head_size]
+ const scalar_t __restrict__ k_cache, // [num_blocks, num_kv_heads, head_size/x, block_size, x]
+ const scalar_t __restrict__ v_cache, // [num_blocks, num_kv_heads, head_size, block_size]
+ ... // Other side args.
+)` [...] `accs`
+`accs`
+`accs`
+`float out_smem = reinterpret_cast<float>(shared_mem);
+for (int i = NUM_WARPS; i > 1; i /= 2) {
+ // Upper warps write to shared memory.
+ ...
+ float dst = &out_smem[(warp_idx - mid)  HEAD_SIZE];
+ for (int i = 0; i < NUM_ROWS_PER_THREAD; i++) {
+ ...
+ dst[row_idx] = accs[i];
+ }
+ // Lower warps update the output.
+ const float src = &out_smem[warp_idx  HEAD_SIZE];
+ for (int i = 0; i < NUM_ROWS_PER_THREAD; i++) {
+ ...
+ accs[i] += src[row_idx];
+ }
+ // Write out the accs.
+}`
+
+## Output¶
+
+Now we can write all of calculated result from local register memory to final output global memory.
+
+`scalar_t out_ptr = out + seq_idx  num_heads  max_num_partitions  HEAD_SIZE
+ + head_idx  max_num_partitions  HEAD_SIZE
+ + partition_idx  HEAD_SIZE;`

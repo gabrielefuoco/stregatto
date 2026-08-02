@@ -155,7 +155,7 @@ function appendMessage(sender, text, isError = false) {
         
         // Parse markdown safely
         const rawHtml = marked.parse(text);
-        bubble.innerHTML = DOMPurify.sanitize(rawHtml);
+        bubble.innerHTML = DOMPurify.sanitize(rawHtml, { ADD_TAGS: ['iframe'], ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'scrolling', 'src', 'class', 'width', 'height'] });
     }
 
     const label = document.createElement('span');

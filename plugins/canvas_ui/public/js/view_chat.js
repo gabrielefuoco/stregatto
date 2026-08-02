@@ -631,7 +631,7 @@ function initChatLogic(container) {
             body.className = 'markdown-body text-sm leading-relaxed overflow-hidden';
 
             if (initialText && window.marked && window.DOMPurify) {
-                body.innerHTML = window.DOMPurify.sanitize(window.marked.parse(initialText));
+                body.innerHTML = window.DOMPurify.sanitize(window.marked.parse(initialText), { ADD_TAGS: ['iframe'], ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'scrolling', 'src', 'class', 'width', 'height'] });
             } else {
                 body.textContent = initialText;
             }
@@ -658,14 +658,14 @@ function initChatLogic(container) {
                     activeTextStep.isLoader = false;
                     activeTextStep.text = textChunk;
                     if (window.marked && window.DOMPurify) {
-                        activeTextStep.body.innerHTML = window.DOMPurify.sanitize(window.marked.parse(activeTextStep.text));
+                        activeTextStep.body.innerHTML = window.DOMPurify.sanitize(window.marked.parse(activeTextStep.text), { ADD_TAGS: ['iframe'], ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'scrolling', 'src', 'class', 'width', 'height'] });
                     } else {
                         activeTextStep.body.textContent = activeTextStep.text;
                     }
                 } else {
                     activeTextStep.text += textChunk;
                     if (window.marked && window.DOMPurify) {
-                        activeTextStep.body.innerHTML = window.DOMPurify.sanitize(window.marked.parse(activeTextStep.text));
+                        activeTextStep.body.innerHTML = window.DOMPurify.sanitize(window.marked.parse(activeTextStep.text), { ADD_TAGS: ['iframe'], ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'scrolling', 'src', 'class', 'width', 'height'] });
                     } else {
                         activeTextStep.body.textContent = activeTextStep.text;
                     }
@@ -680,7 +680,7 @@ function initChatLogic(container) {
                     activeTextStep.isLoader = false;
                     activeTextStep.text = newText;
                     if (window.marked && window.DOMPurify) {
-                        activeTextStep.body.innerHTML = window.DOMPurify.sanitize(window.marked.parse(activeTextStep.text));
+                        activeTextStep.body.innerHTML = window.DOMPurify.sanitize(window.marked.parse(activeTextStep.text), { ADD_TAGS: ['iframe'], ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'scrolling', 'src', 'class', 'width', 'height'] });
                     } else {
                         activeTextStep.body.textContent = activeTextStep.text;
                     }
@@ -896,6 +896,8 @@ function initChatLogic(container) {
             const sanitizeMessagesForApi = (messages) => {
                 let cleanMessages = [];
                 messages.forEach(m => {
+                    if (m.role === 'tool') return;
+
                     let cleanContent = [];
                     if (Array.isArray(m.content)) {
                         m.content.forEach(c => {
@@ -906,22 +908,24 @@ function initChatLogic(container) {
                                 const filePath = c.path || c.file_path || c.file_url || c.url || '';
                                 const fileName = c.name || c.file_name || 'allegato';
                                 cleanContent.push({ type: 'text', text: `[File Allegato: "${fileName}" (Percorso file: "${filePath}")]` });
-                            } else if (c.type === 'tool_use' || c.type === 'tool_call') {
-                                cleanContent.push(c);
                             }
+                            // drop tool_use and tool_call to prevent OpenAI 400 errors (invalid message order)
                         });
                     } else if (typeof m.content === 'string') {
                         cleanContent.push({ type: 'text', text: m.content });
                     }
+                    
                     if (cleanContent.length === 0) {
                         cleanContent.push({ type: 'text', text: '' });
                     }
                     
                     const role = m.role || 'user';
+                    let newMsg = { role: role, content: cleanContent };
+                    
                     if (role === 'user' && cleanMessages.length > 0 && cleanMessages[cleanMessages.length - 1].role === 'user') {
                         cleanMessages[cleanMessages.length - 1].content.push(...cleanContent);
                     } else {
-                        cleanMessages.push({ role: role, content: cleanContent });
+                        cleanMessages.push(newMsg);
                     }
                 });
 
