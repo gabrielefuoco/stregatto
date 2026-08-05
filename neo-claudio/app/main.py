@@ -3,25 +3,33 @@ import json
 import logging
 from pathlib import Path
 from dotenv import load_dotenv
-from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Body
+from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Body, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse, StreamingResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+import base64
+import asyncio
+
+from .pty_manager import pty_manager, build_claude_command
 
 # Carica variabili d'ambiente dalla radice del repo
 root_env = Path(__file__).resolve().parent.parent.parent / ".env"
 load_dotenv(root_env)
 
 
-from .db import init_db, ChatDB, UserSettingsDB
+from .db import init_db, UserSettingsDB
 from .auth import get_current_user, AuthUser
-from .chats import router as chats_router
-from .bridge import run_claude_stream, cancel_session_process
+
+from .projects import router as projects_router
+from .sessions import router as sessions_router
+from .presets import router as presets_router
+from .mcp_apps import router as mcp_apps_router
+from .db import seed_default_presets
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("stregatto_v3.main")
 
-app = FastAPI(title="Stregatto V3 API", version="3.0.0")
+app = FastAPI(title="Neo-Claudio API", version="3.0.0")
 
 # CORS Middleware
 app.add_middleware(
@@ -36,12 +44,21 @@ app.add_middleware(
 @app.on_event("startup")
 async def startup_event():
     await init_db()
-    logger.info("Stregatto V3 Database inizializzato con successo.")
+    await seed_default_presets("system")
+    logger.info("Neo-Claudio Database inizializzato con successo e preset di default caricati.")
 
 
 
-# Includi le rotte CRUD delle Chat
-app.include_router(chats_router)
+@app.on_event("shutdown")
+async def shutdown_event():
+    await pty_manager.kill_all()
+    logger.info("PTYManager shutdown complete.")
+
+# Includi le rotte API
+app.include_router(projects_router)
+app.include_router(sessions_router)
+app.include_router(presets_router)
+app.include_router(mcp_apps_router)
 
 
 # --- ENDPOINTS CORE ---
@@ -168,89 +185,73 @@ async def upload_file(
         "path": str(file_path.absolute())
     }
 
-
-@app.post("/agents/{agent_slug}/cancel")
-async def cancel_agent_run(
-    agent_slug: str,
-    payload: dict = Body(default={}),
-    current_user: AuthUser = Depends(get_current_user)
-):
-    """Endpoint per interrompere la generazione in corso."""
-    session_id = payload.get("session_id")
-    chat_id = payload.get("chat_id")
-    cancelled = await cancel_session_process(session_id=session_id, chat_id=chat_id)
-    return {"status": "cancelled" if cancelled else "not_found", "cancelled": cancelled}
-
-
-@app.post("/agents/{agent_slug}/message")
-async def send_agent_message(
-    agent_slug: str,
-    payload: dict = Body(...),
-    current_user: AuthUser = Depends(get_current_user)
-):
-    """
-    Endpoint primario di chat.
-    Riceve il messaggio dall'utente e restituisce uno stream SSE alimentato da Claude CLI.
-    """
-    messages = payload.get("messages", [])
-    if not messages:
-        raise HTTPException(status_code=400, detail="Il campo 'messages' è obbligatorio.")
-
-    # Estraiamo il messaggio dell'utente e l'eventuale cronologia
-    last_user_message = messages[-1]
-    prompt_text = ""
+@app.websocket("/ws/pty/{session_id}")
+async def pty_websocket(websocket: WebSocket, session_id: str):
+    await websocket.accept()
     
-    if isinstance(last_user_message.get("content"), list):
-        for item in last_user_message["content"]:
-            if item.get("type") == "text":
-                prompt_text += item.get("text", "")
-    elif isinstance(last_user_message.get("content"), str):
-        prompt_text = last_user_message["content"]
-
-    if not prompt_text:
-        raise HTTPException(status_code=400, detail="Messaggio utente vuoto.")
-
-    if len(messages) > 1:
-        history_lines = []
-        for msg in messages[:-1]:
-            role = msg.get("role", "user").upper()
-            content_str = ""
-            if isinstance(msg.get("content"), list):
-                content_str = " ".join([c.get("text", "") for c in msg["content"] if c.get("type") == "text"])
-            elif isinstance(msg.get("content"), str):
-                content_str = msg["content"]
-            if content_str.strip():
-                history_lines.append(f"[{role}]: {content_str.strip()}")
-        if history_lines:
-            prompt_text = "Cronologia della conversazione:\n" + "\n".join(history_lines) + f"\n\n[USER - Nuova Richiesta]: {prompt_text}"
-
-    chat_id = payload.get("chat_id")
-    session_id = None
-
-    if chat_id:
-        chat_obj = await ChatDB.objects().where(ChatDB.id == chat_id).first()
-        if chat_obj and chat_obj.claude_session_id:
-            session_id = chat_obj.claude_session_id
-
-    user_settings = await UserSettingsDB.objects().where(UserSettingsDB.user_id == current_user.id).first()
-    openrouter_key = (user_settings.openrouter_key if user_settings and user_settings.openrouter_key else os.environ.get("OPENROUTER_API_KEY"))
+    token = websocket.query_params.get("token")
     
-    req_model = payload.get("model")
-    if not req_model or req_model == "default":
-        model = (user_settings.default_model if user_settings and user_settings.default_model else "poolside/laguna-s-2.1:free")
-    else:
-        model = req_model
+    preset = {"dangerously_skip_permissions": True}
+    cwd = "." 
+    cmd, env = build_claude_command(preset, cwd)
+    
+    session = pty_manager.get_session(session_id)
+    if not session:
+        session = await pty_manager.spawn(session_id, cmd, cwd, env, cols=120, rows=40)
+        
+    async def read_pty():
+        try:
+            while True:
+                data = await pty_manager.read(session_id, 4096)
+                if not data:
+                    await websocket.send_json({"type": "exit", "code": 0})
+                    break
+                payload = base64.b64encode(data).decode('ascii')
+                await websocket.send_json({
+                    "type": "output",
+                    "data": payload
+                })
+        except asyncio.CancelledError:
+            pass
+        except Exception as e:
+            print(f"Error reading from PTY: {e}")
 
-    # Ritorna lo stream SSE generato dal bridge
-    generator = run_claude_stream(
-        prompt=prompt_text,
-        session_id=session_id,
-        openrouter_key=openrouter_key,
-        model=model,
-        chat_id=chat_id
+    async def write_pty():
+        try:
+            while True:
+                msg_str = await websocket.receive_text()
+                try:
+                    msg = json.loads(msg_str)
+                except json.JSONDecodeError:
+                    continue
+                    
+                msg_type = msg.get("type")
+                if msg_type == "input":
+                    data = msg.get("data", "")
+                    await pty_manager.write(session_id, data.encode('utf-8'))
+                elif msg_type == "resize":
+                    cols = msg.get("cols", 80)
+                    rows = msg.get("rows", 24)
+                    await pty_manager.resize(session_id, cols, rows)
+                elif msg_type == "ping":
+                    await websocket.send_json({"type": "pong"})
+        except WebSocketDisconnect:
+            print(f"WebSocket disconnected per session {session_id}")
+        except asyncio.CancelledError:
+            pass
+        except Exception as e:
+            print(f"Error writing to PTY: {e}")
+
+    read_task = asyncio.create_task(read_pty())
+    write_task = asyncio.create_task(write_pty())
+    
+    done, pending = await asyncio.wait(
+        [read_task, write_task],
+        return_when=asyncio.FIRST_COMPLETED
     )
-
-    return StreamingResponse(generator, media_type="text/event-stream")
+    
+    for task in pending:
+        task.cancel()
 
 
 # --- STATIC FILES (Canvas UI) ---

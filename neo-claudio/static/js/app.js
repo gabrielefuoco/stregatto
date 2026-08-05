@@ -1,179 +1,116 @@
-// app.js
-import { CatClient } from './cat_client.js';
-import { setLanguage, getLanguage, translatePage } from './i18n.js';
+import { TerminalManager } from './terminal.js';
+import { ProjectsSidebar } from './view_projects_sidebar.js';
+import { TabBar } from './view_tab_bar.js';
+import { AgentGallery } from './view_agent_gallery.js';
+import { Toolbar } from './view_toolbar.js';
+import { McpSidebar } from './view_mcp_sidebar.js';
 
-// CodeMirror imports (Zero-Build via esm.sh)
-import { EditorState } from "https://esm.sh/@codemirror/state";
-import { EditorView, keymap } from "https://esm.sh/@codemirror/view";
-import { defaultKeymap } from "https://esm.sh/@codemirror/commands";
-import { javascript } from "https://esm.sh/@codemirror/lang-javascript";
-import { python } from "https://esm.sh/@codemirror/lang-python";
-import { oneDark } from "https://esm.sh/@codemirror/theme-one-dark";
-import { basicSetup } from "https://esm.sh/codemirror";
-
-// DOM Elements
-const chatForm = document.getElementById('chat-form');
-const chatInput = document.getElementById('chat-input');
-const messagesContainer = document.getElementById('messages-container');
-const emptyState = document.getElementById('empty-state');
-const btnTheme = document.getElementById('btn-theme');
-const btnLang = document.getElementById('btn-lang');
-const canvasPanel = document.getElementById('canvas-panel');
-const btnCloseCanvas = document.getElementById('btn-close-canvas');
-const editorHost = document.getElementById('editor-host');
-const editorEmpty = document.getElementById('editor-empty');
-
-// State
-let cat = new CatClient();
-let editorView = null;
-let currentCode = "";
-
-// Initialize
-function init() {
-    translatePage();
-    setupEventListeners();
-    initCodeMirror();
-    
-    // Connect to Cheshire Cat
-    cat.connect().catch(err => console.error("Failed to connect", err));
-    
-    // Listen to Cat events
-    cat.on('chat', handleAgentMessage);
-    cat.on('error', (err) => appendMessage('System', 'Error: ' + (err.error || 'Unknown error'), true));
-}
-
-// UI Event Listeners
-function setupEventListeners() {
-    // Theme Toggle
-    btnTheme.addEventListener('click', () => {
-        const root = document.documentElement;
-        const newTheme = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-        root.setAttribute('data-theme', newTheme);
-    });
-
-    // Language Toggle
-    btnLang.addEventListener('click', () => {
-        const newLang = getLanguage() === 'it' ? 'en' : 'it';
-        setLanguage(newLang);
-        btnLang.textContent = newLang.toUpperCase();
-    });
-
-    // Chat form submit
-    chatForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const text = chatInput.value.trim();
-        if (!text) return;
-
-        appendMessage('User', text, false);
-        cat.send(text);
+class App {
+    constructor() {
+        this.activeProjectId = null;
+        this.termManager = new TerminalManager();
+        this.sidebar = new ProjectsSidebar(document.getElementById('sidebar-container'), this);
+        this.tabBar = new TabBar(document.getElementById('tab-bar-container'), this);
         
-        chatInput.value = '';
-        chatInput.style.height = 'auto'; // reset height
-    });
-
-    // Auto-resize textarea
-    chatInput.addEventListener('input', function() {
-        this.style.height = 'auto';
-        this.style.height = (this.scrollHeight) + 'px';
-    });
-
-    // Enter to send (Shift+Enter for newline)
-    chatInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            chatForm.dispatchEvent(new Event('submit'));
+        // Step 06 & 07 Components
+        this.agentGallery = new AgentGallery();
+        this.mcpSidebar = new McpSidebar();
+        
+        // Initialize MCP Sidebar if container exists, else we create one
+        let mcpContainer = document.getElementById('mcp-sidebar-container');
+        if (!mcpContainer) {
+            mcpContainer = document.createElement('div');
+            mcpContainer.id = 'mcp-sidebar-container';
+            document.body.appendChild(mcpContainer);
         }
-    });
+        this.mcpSidebar.init(mcpContainer);
+        window.mcpSidebar = this.mcpSidebar; // for global shortcut
 
-    // Mobile Canvas Close
-    if(btnCloseCanvas) {
-        btnCloseCanvas.addEventListener('click', () => {
-            canvasPanel.classList.add('translate-x-full');
-            setTimeout(() => {
-                canvasPanel.classList.add('hidden');
-                canvasPanel.classList.remove('flex');
-            }, 300);
+        this.initGlobalHotkeys();
+    }
+
+    async selectProject(projectId) {
+        if (this.activeProjectId === projectId) return;
+        this.activeProjectId = projectId;
+        
+        try {
+            const res = await fetch(`/projects/${projectId}/sessions`);
+            if (res.ok) {
+                const sessions = await res.json();
+                this.tabBar.loadSessions(sessions);
+            }
+        } catch (error) {
+            console.error("Error loading project sessions:", error);
+        }
+    }
+
+    switchActiveTerminal(sessionId) {
+        // Nascondi tutti i container dei terminali
+        document.querySelectorAll('.terminal-container').forEach(el => el.style.display = 'none');
+        
+        // Verifica se l'elemento terminale esiste, altrimenti crealo
+        let targetEl = document.getElementById(`term-${sessionId}`);
+        if (!targetEl) {
+            targetEl = document.createElement('div');
+            targetEl.id = `term-${sessionId}`;
+            targetEl.className = 'terminal-container h-full w-full relative';
+            document.getElementById('terminal-area').appendChild(targetEl);
+            
+            // Create toolbar container
+            const toolbarContainer = document.createElement('div');
+            toolbarContainer.id = `toolbar-${sessionId}`;
+            targetEl.appendChild(toolbarContainer);
+            
+            // Create terminal viewport container
+            const termViewport = document.createElement('div');
+            termViewport.className = 'term-viewport-inner h-[calc(100%-48px)] w-full';
+            targetEl.appendChild(termViewport);
+            
+            // Crea e connetti
+            this.termManager.create(sessionId, termViewport);
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            // Prendi il token per auth
+            const wsUrl = `${protocol}//${window.location.host}/ws/pty/${sessionId}?token=test`;
+            this.termManager.connect(sessionId, wsUrl);
+            
+            // Render toolbar
+            const toolbar = new Toolbar({ id: sessionId }, {
+                sendData: (data) => {
+                    const ws = this.termManager.websockets && this.termManager.websockets[sessionId];
+                    if (ws && ws.readyState === WebSocket.OPEN) {
+                        ws.send(JSON.stringify({ type: 'input', data: data }));
+                    }
+                }
+            });
+            toolbar.render(toolbarContainer);
+        }
+        
+        // Mostra quello richiesto
+        targetEl.style.display = 'block';
+        
+        // Forza il resize di xterm.js
+        const term = this.termManager.getTerminal(sessionId);
+        if (term) {
+             term.fitAddon.fit();
+             term.refresh(0, term.rows - 1);
+             term.focus();
+        }
+    }
+
+    clearTerminalArea() {
+        document.querySelectorAll('.terminal-container').forEach(el => el.style.display = 'none');
+    }
+
+    initGlobalHotkeys() {
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key.toLowerCase() === 'b') {
+                e.preventDefault();
+                document.body.classList.toggle('sidebar-collapsed');
+            }
         });
     }
 }
 
-function initCodeMirror() {
-    let state = EditorState.create({
-        doc: "",
-        extensions: [
-            basicSetup,
-            keymap.of(defaultKeymap),
-            javascript(),
-            oneDark
-        ]
-    });
-
-    editorView = new EditorView({
-        state,
-        parent: editorHost
-    });
-}
-
-function updateCanvas(code) {
-    if (!editorView) return;
-    
-    // Show Canvas on mobile if hidden
-    canvasPanel.classList.remove('hidden');
-    canvasPanel.classList.add('flex');
-    setTimeout(() => canvasPanel.classList.remove('translate-x-full'), 10);
-
-    editorEmpty.classList.add('hidden');
-    editorHost.classList.remove('hidden');
-
-    const transaction = editorView.state.update({
-        changes: {from: 0, to: editorView.state.doc.length, insert: code}
-    });
-    editorView.dispatch(transaction);
-}
-
-function appendMessage(sender, text, isError = false) {
-    if (emptyState) emptyState.style.display = 'none';
-
-    const msgDiv = document.createElement('div');
-    msgDiv.className = `flex flex-col max-w-[85%] ${sender === 'User' ? 'self-end' : 'self-start'}`;
-    
-    const bubble = document.createElement('div');
-    bubble.className = `p-4 rounded-xl shadow-sm ${sender === 'User' ? 'rounded-br-none' : 'rounded-bl-none'} ${isError ? 'bg-red-500/10 text-red-500 border border-red-500/20' : 'markdown-body'}`;
-    
-    if (sender === 'User') {
-        bubble.style.backgroundColor = 'var(--msg-user)';
-        bubble.textContent = text; // Plain text for user
-    } else {
-        bubble.style.backgroundColor = 'var(--msg-agent)';
-        
-        // Very basic extraction of the first markdown code block for the Canvas
-        const codeBlockRegex = /```[\w]*\n([\s\S]*?)```/;
-        const match = text.match(codeBlockRegex);
-        if (match && match[1]) {
-            updateCanvas(match[1]);
-        }
-        
-        // Parse markdown safely
-        const rawHtml = marked.parse(text);
-        bubble.innerHTML = DOMPurify.sanitize(rawHtml, { ADD_TAGS: ['iframe'], ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'scrolling', 'src', 'class', 'width', 'height'] });
-    }
-
-    const label = document.createElement('span');
-    label.className = `text-xs mt-1 text-[var(--text-secondary)] ${sender === 'User' ? 'text-right' : 'text-left'}`;
-    label.textContent = sender;
-
-    msgDiv.appendChild(bubble);
-    msgDiv.appendChild(label);
-    messagesContainer.appendChild(msgDiv);
-
-    // Scroll to bottom
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-}
-
-function handleAgentMessage(data) {
-    // The Cat sends 'chat' events with the final message in data.text
-    appendMessage('Cat', data.text || data.content || JSON.stringify(data));
-}
-
-// Start
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', () => {
+    window.stregattoApp = new App();
+});

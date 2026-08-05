@@ -21,31 +21,31 @@
 
 ### Dipendenze
 
-- [ ] Creare `requirements.txt` nella root di `neo-claudio` con tutte le dipendenze:
+- [x] Creare `requirements.txt` nella root di `neo-claudio` con tutte le dipendenze:
   - `fastapi`, `uvicorn[standard]`, `piccolo[all]`, `python-dotenv`, `pyjwt`
   - `pywinpty` (Windows) / nota che `pty` è builtin su Unix
   - `websockets` (se non incluso in uvicorn[standard])
-- [ ] Installare le dipendenze e verificare che `import winpty` (Windows) o `import pty` (Unix) funzioni
+- [x] Installare le dipendenze e verificare che `import winpty` (Windows) o `import pty` (Unix) funzioni
 
 ### PTY Manager
 
-- [ ] Creare `app/pty_manager.py` con la classe `PTYSession` (dataclass):
+- [x] Creare `app/pty_manager.py` con la classe `PTYSession` (dataclass):
   - Campi: `session_id`, `process`, `pty_handle`, `project_id`, `preset_slug`, `cols`, `rows`, `created_at`
-- [ ] Implementare `PTYManager.__init__()`: dizionario in-memory delle sessioni attive
-- [ ] Implementare `PTYManager.spawn(session_id, command, cwd, env, cols, rows)`:
+- [x] Implementare `PTYManager.__init__()`: dizionario in-memory delle sessioni attive
+- [x] Implementare `PTYManager.spawn(session_id, command, cwd, env, cols, rows)`:
   - Windows: usare `winpty.PtyProcess.spawn()` con ConPTY
   - Unix: usare `pty.openpty()` + `subprocess.Popen`
   - Registrare la sessione nel dizionario
-- [ ] Implementare `PTYManager.read(session_id)`: lettura non bloccante dallo stdout del PTY
-- [ ] Implementare `PTYManager.write(session_id, data)`: scrittura nello stdin del PTY
-- [ ] Implementare `PTYManager.resize(session_id, cols, rows)`: ridimensionamento terminale
-- [ ] Implementare `PTYManager.kill(session_id)`:
+- [x] Implementare `PTYManager.read(session_id)`: lettura non bloccante dallo stdout del PTY
+- [x] Implementare `PTYManager.write(session_id, data)`: scrittura nello stdin del PTY
+- [x] Implementare `PTYManager.resize(session_id, cols, rows)`: ridimensionamento terminale
+- [x] Implementare `PTYManager.kill(session_id)`:
   - Windows: `taskkill /F /T /PID`
   - Unix: `SIGTERM` → attesa 2s → `SIGKILL`
   - Rimuovere la sessione dal dizionario
-- [ ] Implementare `PTYManager.kill_all()`: cleanup all'arresto dell'app
-- [ ] Implementare `PTYManager.list_sessions()` e `PTYManager.get_session(session_id)`
-- [ ] Implementare `build_claude_command(preset, cwd)`:
+- [x] Implementare `PTYManager.kill_all()`: cleanup all'arresto dell'app
+- [x] Implementare `PTYManager.list_sessions()` e `PTYManager.get_session(session_id)`
+- [x] Implementare `build_claude_command(preset, cwd)`:
   - Risolvere l'eseguibile `claude` (stessa logica di `bridge.py` ma SENZA `--output-format stream-json` e SENZA `-p`)
   - Applicare flag dal preset: `--model`, `--system-prompt`, `--permission-mode`, `--allowedTools`, `--name`
   - Se c'è OpenRouter key: impostare `ANTHROPIC_BASE_URL` e `ANTHROPIC_AUTH_TOKEN` nell'env
@@ -53,10 +53,10 @@
 
 ### WebSocket Endpoint
 
-- [ ] In `app/main.py`, aggiungere l'import di `WebSocket` e `WebSocketDisconnect` da FastAPI
-- [ ] Creare istanza globale `pty_manager = PTYManager()`
-- [ ] Aggiungere evento `@app.on_event("shutdown")` che chiama `pty_manager.kill_all()`
-- [ ] Implementare endpoint `@app.websocket("/ws/pty/{session_id}")`:
+- [x] In `app/main.py`, aggiungere l'import di `WebSocket` e `WebSocketDisconnect` da FastAPI
+- [x] Creare istanza globale `pty_manager = PTYManager()`
+- [x] Aggiungere evento `@app.on_event("shutdown")` che chiama `pty_manager.kill_all()`
+- [x] Implementare endpoint `@app.websocket("/ws/pty/{session_id}")`:
   - Accettare la connessione WebSocket
   - Autenticare l'utente (estrarre token dalla query string `?token=`)
   - Recuperare o creare la sessione PTY
@@ -67,14 +67,14 @@
 
 ### Verifica Step 01
 
-- [ ] Avviare il server: `uvicorn app.main:app --reload --port 8000`
-- [ ] Verificare che non ci siano errori di import o crash
-- [ ] Testare il WebSocket con una pagina HTML minimale o `websocat`:
+- [x] Avviare il server: `uvicorn app.main:app --reload --port 8000`
+- [x] Verificare che non ci siano errori di import o crash
+- [x] Testare il WebSocket con una pagina HTML minimale o `websocat`:
   - Connettersi a `ws://localhost:8000/ws/pty/test123`
   - Inviare `{"type": "input", "data": "echo hello\n"}`
   - Ricevere output dal PTY
-- [ ] Verificare che `resize` funzioni
-- [ ] Verificare che la chiusura della connessione WebSocket NON uccida il PTY
+- [x] Verificare che `resize` funzioni
+- [x] Verificare che la chiusura della connessione WebSocket NON uccida il PTY
 
 ---
 
@@ -84,16 +84,16 @@
 
 ### Dipendenze Frontend
 
-- [ ] In `static/index.html`, aggiungere i CDN per xterm.js v5:
+- [x] In `static/index.html`, aggiungere i CDN per xterm.js v5:
   - `xterm.js` core (CSS + JS)
   - `xterm-addon-fit`
   - `xterm-addon-web-links`
   - `xterm-addon-search`
-- [ ] Verificare che i CDN si carichino correttamente aprendo la console del browser
+- [x] Verificare che i CDN si carichino correttamente aprendo la console del browser
 
 ### Terminal Manager
 
-- [ ] Creare `static/js/terminal.js` con la classe `TerminalManager`:
+- [x] Creare `static/js/terminal.js` con la classe `TerminalManager`:
   - `constructor()`: mappa di istanze Terminal per session_id
   - Definire l'oggetto tema `STREGATTO_LIGHT_THEME`:
     - `background: 'rgba(255, 255, 255, 0.88)'`
@@ -106,44 +106,44 @@
   - `destroy(sessionId)`: distrugge Terminal e chiude WS
   - `resize(sessionId)`: triggera fit addon
   - `getTerminal(sessionId)`: restituisce l'istanza
-- [ ] Gestire la riconnessione con backoff esponenziale (1s, 2s, 4s, 8s, max 30s)
-- [ ] Gestire l'encoding base64 per i dati del terminale (in e out)
+- [x] Gestire la riconnessione con backoff esponenziale (1s, 2s, 4s, 8s, max 30s)
+- [x] Gestire l'encoding base64 per i dati del terminale (in e out)
 
 ### CSS Tema e Dot Grid
 
-- [ ] In `static/css/themes.css`, aggiungere le regole per il container del terminale:
+- [x] In `static/css/themes.css`, aggiungere le regole per il container del terminale:
   - `.terminal-container`: position relative, background dot grid (`radial-gradient(circle, #D4D4D4 1px, transparent 1px)`, `background-size: 20px 20px`), border Neo-Brutalist (`2px solid #1A1C1C`), shadow (`4px 4px 0px 0px #1A1C1C`)
   - `.terminal-container .xterm-viewport`: `background-color: rgba(255, 255, 255, 0.85) !important` per far trasparire la dot grid
-- [ ] Aggiungere regole CSS per il layout a 3 colonne:
+- [x] Aggiungere regole CSS per il layout a 3 colonne:
   - `.app-layout`: CSS Grid con `grid-template-columns: 280px 1fr auto`
   - `.sidebar-left`: larghezza fissa 280px, `border-right: 2px solid #1A1C1C`, altezza piena
   - `.sidebar-right`: larghezza 360px, `border-left: 2px solid #1A1C1C`, collassabile
   - `.main-content`: flex column con tab bar + toolbar + terminal container
-- [ ] Aggiungere regole responsive:
+- [x] Aggiungere regole responsive:
   - `@media (max-width: 1200px)`: sidebar sinistra collassabile, sidebar destra nascosta
   - `@media (max-width: 768px)`: solo terminale full-screen, hamburger menu
 
 ### Integrazione nella SPA
 
-- [ ] In `static/index.html`, ristrutturare il layout HTML con i container per:
+- [x] In `static/index.html`, ristrutturare il layout HTML con i container per:
   - `.sidebar-left` (progetti)
   - `.main-content` > `.tab-bar` + `.toolbar` + `.terminal-container`
   - `.sidebar-right` (MCP apps)
-- [ ] In `static/js/app.js`, importare e inizializzare `TerminalManager`
-- [ ] Creare un flusso base funzionante:
+- [x] In `static/js/app.js`, importare e inizializzare `TerminalManager`
+- [x] Creare un flusso base funzionante:
   - Al caricamento della pagina, creare un terminale di test
   - Connetterlo al WebSocket `ws://localhost:8000/ws/pty/test-session`
   - L'utente deve poter digitare nel terminale e vedere output
 
 ### Verifica Step 02
 
-- [ ] Aprire `http://localhost:8000/` nel browser
-- [ ] Il terminale deve renderizzarsi con tema chiaro e dot grid visibile
-- [ ] Digitare comandi nel terminale → i caratteri appaiono (connesso al PTY dallo Step 01)
-- [ ] Ridimensionare la finestra del browser → il terminale si adatta automaticamente
-- [ ] Gli URL nell'output del terminale devono essere cliccabili
-- [ ] La dot grid deve essere visibile ma non invadente
-- [ ] I bordi e le ombre Neo-Brutalist devono essere presenti
+- [x] Aprire `http://localhost:8000/` nel browser
+- [x] Il terminale deve renderizzarsi con tema chiaro e dot grid visibile
+- [x] Digitare comandi nel terminale → i caratteri appaiono (connesso al PTY dallo Step 01)
+- [x] Ridimensionare la finestra del browser → il terminale si adatta automaticamente
+- [x] Gli URL nell'output del terminale devono essere cliccabili
+- [x] La dot grid deve essere visibile ma non invadente
+- [x] I bordi e le ombre Neo-Brutalist devono essere presenti
 
 ---
 
@@ -153,18 +153,18 @@
 
 ### Nuovi modelli DB
 
-- [ ] Riscrivere `app/db.py` con i nuovi modelli Piccolo:
+- [x] Riscrivere `app/db.py` con i nuovi modelli Piccolo:
   - `ProjectDB` (tabella `stregatto_projects`): id, user_id, name, path, mode, icon, default_preset_id, pinned, created_at, updated_at
   - `SessionDB` (tabella `stregatto_sessions`): id, project_id, user_id, name, claude_session_id, preset_id, model, state, pinned, tab_order, context, created_at, updated_at, archived_at
   - `AgentPresetDB` (tabella `stregatto_agent_presets`): id, user_id, slug, name, icon, description, model, system_prompt, permission_mode, allowed_tools, mcp_servers, env_vars, is_default, created_at, updated_at
   - `UserSettingsDB` (tabella `stregatto_user_settings`): estendere con `favorite_models` (JSON), `theme` (Text), `notifications_enabled` (Boolean), `tailscale_ip` (Text), `tailscale_port` (Integer)
-- [ ] Mantenere `ChatDB` temporaneamente per la migrazione (non cancellarlo ancora)
-- [ ] Aggiornare `init_db()` per creare tutte le nuove tabelle
-- [ ] Aggiungere funzione `seed_default_presets(user_id)` che crea i 3 preset built-in (Stregatto, Guardian, Researcher) se non esistono
+- [x] Mantenere `ChatDB` temporaneamente per la migrazione (non cancellarlo ancora)
+- [x] Aggiornare `init_db()` per creare tutte le nuove tabelle
+- [x] Aggiungere funzione `seed_default_presets(user_id)` che crea i 3 preset built-in (Stregatto, Guardian, Researcher) se non esistono
 
 ### Router Progetti
 
-- [ ] Creare `app/projects.py` con APIRouter:
+- [x] Creare `app/projects.py` con APIRouter:
   - `GET /projects`: lista progetti dell'utente (pinned first, poi per updated_at desc)
   - `GET /projects/{id}`: dettaglio progetto con conteggio sessioni
   - `POST /projects`: crea progetto (validare che il path esista se mode=local)
@@ -173,7 +173,7 @@
 
 ### Router Sessioni
 
-- [ ] Creare `app/sessions.py` con APIRouter:
+- [x] Creare `app/sessions.py` con APIRouter:
   - `GET /projects/{project_id}/sessions`: lista sessioni (raggruppate per state: active → suspended → archived)
   - `GET /sessions/{id}`: dettaglio sessione
   - `POST /projects/{project_id}/sessions`: crea sessione (con preset_id opzionale)
@@ -185,7 +185,7 @@
 
 ### Router Preset
 
-- [ ] Creare `app/presets.py` con APIRouter:
+- [x] Creare `app/presets.py` con APIRouter:
   - `GET /presets`: lista preset (system + user)
   - `GET /presets/{id}`: dettaglio preset
   - `POST /presets`: crea preset custom
@@ -195,23 +195,23 @@
 
 ### Registrazione Router
 
-- [ ] In `app/main.py`, importare e registrare i nuovi router:
+- [x] In `app/main.py`, importare e registrare i nuovi router:
   - `app.include_router(projects_router)`
   - `app.include_router(sessions_router)`
   - `app.include_router(presets_router)`
-- [ ] Mantenere `chats_router` per retrocompatibilità temporanea
-- [ ] Nel `startup_event`, chiamare `seed_default_presets("system")` dopo `init_db()`
+- [x] Mantenere `chats_router` per retrocompatibilità temporanea
+- [x] Nel `startup_event`, chiamare `seed_default_presets("system")` dopo `init_db()`
 
 ### Verifica Step 03
 
-- [ ] Avviare il server — nessun errore
-- [ ] Chiamare `GET /presets` → deve restituire i 3 preset built-in
-- [ ] Chiamare `POST /projects` con `{"name": "Test", "path": "C:/tmp/test", "mode": "local"}` → successo
-- [ ] Chiamare `POST /projects/{id}/sessions` con `{"preset_id": "..."}` → successo
-- [ ] Chiamare `GET /projects` → il progetto appare
-- [ ] Chiamare `GET /projects/{id}/sessions` → la sessione appare
-- [ ] Chiamare `PUT /sessions/{id}/archive` → state diventa `archived`
-- [ ] Chiamare `DELETE /projects/{id}` → progetto e sessioni eliminati
+- [x] Avviare il server — nessun errore
+- [x] Chiamare `GET /presets` → deve restituire i 3 preset built-in
+- [x] Chiamare `POST /projects` con `{"name": "Test", "path": "C:/tmp/test", "mode": "local"}` → successo
+- [x] Chiamare `POST /projects/{id}/sessions` con `{"preset_id": "..."}` → successo
+- [x] Chiamare `GET /projects` → il progetto appare
+- [x] Chiamare `GET /projects/{id}/sessions` → la sessione appare
+- [x] Chiamare `PUT /sessions/{id}/archive` → state diventa `archived`
+- [x] Chiamare `DELETE /projects/{id}` → progetto e sessioni eliminati
 
 ---
 
@@ -221,23 +221,23 @@
 
 ### Componente Sidebar
 
-- [ ] Creare `static/js/view_projects_sidebar.js`:
+- [x] Creare `static/js/view_projects_sidebar.js`:
   - `renderProjectsSidebar(containerEl)`: render completo della sidebar
   - `renderProjectCard(project)`: card con icona, nome, path troncato, badge mode (🟢/🔵), conteggio sessioni attive
   - `renderSearchBar()`: input di ricerca che filtra i progetti per nome
   - Event: click su progetto → seleziona e carica sessioni nella tab bar
   - Event: doppio click → apri la prima sessione attiva (o creane una nuova)
-- [ ] Implementare `renderNewProjectModal()`:
+- [x] Implementare `renderNewProjectModal()`:
   - Campi: nome, path (con placeholder), modalità (locale/cloud), icona (emoji picker semplificato)
   - Bottoni: Crea / Annulla
   - Stile: modale Neo-Brutalist (border-2, shadow, sfondo bianco)
-- [ ] Implementare menu contestuale (click destro su progetto):
+- [x] Implementare menu contestuale (click destro su progetto):
   - Modifica, Pin/Unpin, Cambia Modalità, Elimina (con conferma)
-- [ ] Integrare con le API: `GET /projects`, `POST /projects`, `PUT /projects/{id}`, `DELETE /projects/{id}`
+- [x] Integrare con le API: `GET /projects`, `POST /projects`, `PUT /projects/{id}`, `DELETE /projects/{id}`
 
 ### CSS Sidebar
 
-- [ ] In `themes.css`, aggiungere le regole per:
+- [x] In `themes.css`, aggiungere le regole per:
   - `.sidebar-left`: larghezza 280px, overflow-y auto, padding, border-right Neo-Brutalist
   - `.project-card`: padding, border-bottom, transizione ombra su hover
   - `.project-card.active`: border-left arancione 3px, sfondo leggermente diverso
@@ -248,21 +248,21 @@
 
 ### Integrazione
 
-- [ ] In `app.js`, inizializzare la sidebar al caricamento
-- [ ] Collegare la selezione progetto al caricamento delle sessioni nella tab bar
-- [ ] Aggiungere shortcut `Ctrl+B` per toggle sidebar
-- [ ] La sidebar deve mostrare i progetti pinnati prima, poi gli altri per data
+- [x] In `app.js`, inizializzare la sidebar al caricamento
+- [x] Collegare la selezione progetto al caricamento delle sessioni nella tab bar
+- [x] Aggiungere shortcut `Ctrl+B` per toggle sidebar
+- [x] La sidebar deve mostrare i progetti pinnati prima, poi gli altri per data
 
 ### Verifica Step 04
 
-- [ ] La sidebar mostra i progetti dell'utente
-- [ ] Click su un progetto lo seleziona (highlight arancione)
-- [ ] Il bottone "+" apre il modale di creazione progetto
-- [ ] Il modale crea il progetto e la sidebar si aggiorna
-- [ ] Click destro apre il menu contestuale
-- [ ] Pin/Unpin funziona (il progetto pinnato va in cima)
-- [ ] La ricerca filtra i progetti
-- [ ] `Ctrl+B` togla/mostra la sidebar
+- [x] La sidebar mostra i progetti dell'utente
+- [x] Click su un progetto lo seleziona (highlight arancione)
+- [x] Il bottone "+" apre il modale di creazione progetto
+- [x] Il modale crea il progetto e la sidebar si aggiorna
+- [x] Click destro apre il menu contestuale
+- [x] Pin/Unpin funziona (il progetto pinnato va in cima)
+- [x] La ricerca filtra i progetti
+- [x] `Ctrl+B` togla/mostra la sidebar
 
 ---
 
@@ -272,33 +272,33 @@
 
 ### Componente Tab Bar
 
-- [ ] Creare `static/js/view_tab_bar.js` con la classe `TabBar`:
+- [x] Creare `static/js/view_tab_bar.js` con la classe `TabBar`:
   - `constructor(containerEl)`: setup iniziale
   - `renderTabs(sessions)`: render di tutte le tab per il progetto selezionato
   - `renderTab(session)`: singola tab con nome, badge modello, badge mode, pulsante chiudi (✕)
   - `activateTab(sessionId)`: switch tab attiva, mostrare/nascondere terminali
   - `closeTab(sessionId)`: chiudere tab (prompt: Sospendi o Elimina?)
   - `addTab(session)`: aggiungere nuova tab
-- [ ] Implementare il bottone "+" alla fine delle tab:
+- [x] Implementare il bottone "+" alla fine delle tab:
   - Click → mostra un picker rapido dei preset (mini Agent Gallery inline)
   - Seleziona preset → crea sessione via API → spawn PTY → apri tab
-- [ ] Implementare menu contestuale su tab (click destro):
+- [x] Implementare menu contestuale su tab (click destro):
   - Rinomina, Pin 📌 / Unpin, Sospendi ⏸, Archivia 📦, Chiudi ✕
-- [ ] Implementare dropdown sessioni archiviate:
+- [x] Implementare dropdown sessioni archiviate:
   - Bottone `📦 Archiviate (N)` visibile solo se ci sono sessioni archiviate
   - Click → dropdown con lista. Click su una → riprendi (`PUT /sessions/{id}/resume`)
-- [ ] Implementare drag & drop per riordinare le tab
+- [x] Implementare drag & drop per riordinare le tab
 
 ### Multi-Terminal Management
 
-- [ ] Ogni sessione ha la propria istanza `Terminal` (xterm.js) e il proprio WebSocket
-- [ ] Solo la tab attiva è visibile (`display: block`), le altre sono nascoste (`display: none`)
-- [ ] Quando si switcha tab, chiamare `terminal.refresh()` per sincronizzare il display
-- [ ] Il WebSocket delle tab in background resta aperto (il PTY continua a funzionare)
+- [x] Ogni sessione ha la propria istanza `Terminal` (xterm.js) e il proprio WebSocket
+- [x] Solo la tab attiva è visibile (`display: block`), le altre sono nascoste (`display: none`)
+- [x] Quando si switcha tab, chiamare `terminal.refresh()` per sincronizzare il display
+- [x] Il WebSocket delle tab in background resta aperto (il PTY continua a funzionare)
 
 ### CSS Tab Bar
 
-- [ ] In `themes.css`, aggiungere le regole per:
+- [x] In `themes.css`, aggiungere le regole per:
   - `.tab-bar`: container orizzontale scrollabile, border-bottom Neo-Brutalist, altezza 40px
   - `.tab`: inline-flex, border Neo-Brutalist, padding 8px 16px, transizione ombra
   - `.tab.active`: border-bottom arancione 3px, ombra elevata
@@ -311,31 +311,31 @@
 
 ### Integrazione con PTY
 
-- [ ] Quando si crea una nuova sessione (bottone "+"):
+- [x] Quando si crea una nuova sessione (bottone "+"):
   1. `POST /projects/{id}/sessions` con `preset_id`
   2. Connettere `TerminalManager.create(sessionId, containerEl)`
   3. Connettere `TerminalManager.connect(sessionId, wsUrl)`
   4. Il WebSocket endpoint spawna il PTY se non esiste
-- [ ] Quando si chiude una tab con "Sospendi":
+- [x] Quando si chiude una tab con "Sospendi":
   1. `PUT /sessions/{id}/suspend` → backend uccide il PTY
   2. `TerminalManager.destroy(sessionId)`
   3. La sessione resta nel DB come `suspended`
-- [ ] Quando si riprende una sessione archiviata/sospesa:
+- [x] Quando si riprende una sessione archiviata/sospesa:
   1. `PUT /sessions/{id}/resume`
   2. Backend spawna nuovo PTY con `claude --resume <claude_session_id>`
   3. Frontend crea nuovo Terminal e lo connette
 
 ### Verifica Step 05
 
-- [ ] Le tab appaiono per il progetto selezionato nella sidebar
-- [ ] Click su una tab switcha il terminale visibile
-- [ ] Il bottone "+" crea una nuova sessione e apre un nuovo terminale
-- [ ] Click destro su tab mostra il menu contestuale
-- [ ] "Sospendi" chiude il terminale ma la sessione resta nell'elenco come sospesa
-- [ ] "Riprendi" su una sessione sospesa riapre un terminale con `--resume`
-- [ ] "Archivia" sposta la sessione nel dropdown archiviate
-- [ ] Drag & drop riordina le tab
-- [ ] Sessioni pinnate restano sempre a sinistra
+- [x] Le tab appaiono per il progetto selezionato nella sidebar
+- [x] Click su una tab switcha il terminale visibile
+- [x] Il bottone "+" crea una nuova sessione e apre un nuovo terminale
+- [x] Click destro su tab mostra il menu contestuale
+- [x] "Sospendi" chiude il terminale ma la sessione resta nell'elenco come sospesa
+- [x] "Riprendi" su una sessione sospesa riapre un terminale con `--resume`
+- [x] "Archivia" sposta la sessione nel dropdown archiviate
+- [x] Drag & drop riordina le tab
+- [x] Sessioni pinnate restano sempre a sinistra
 
 ---
 
@@ -345,12 +345,12 @@
 
 ### Agent Gallery
 
-- [ ] Creare `static/js/view_agent_gallery.js`:
+- [x] Creare `static/js/view_agent_gallery.js`:
   - `AgentGallery.render(containerEl)`: griglia di card preset (3 colonne desktop, 2 tablet, 1 mobile)
   - `AgentGallery.renderPresetCard(preset)`: card con icona, nome, descrizione, modello, permessi, riassunto tool
   - Hover: ombra shift da `4px 4px #1A1C1C` a `2px 2px #FF5F1F`
   - Click su "Avvia": seleziona preset e crea nuova sessione nel progetto attivo
-- [ ] Implementare form creazione/modifica preset:
+- [x] Implementare form creazione/modifica preset:
   - Nome, Icona (selettore emoji), Descrizione
   - Modello (dropdown dai modelli disponibili via `GET /llms`)
   - System Prompt (textarea)
@@ -358,11 +358,11 @@
   - Allowed Tools (checkbox: Read, Write, Edit, Bash, Grep, Glob, WebFetch, etc.)
   - MCP Servers (checkbox list)
   - Bottoni: Salva / Annulla / Elimina (se editing)
-- [ ] Integrare con le API: `GET /presets`, `POST /presets`, `PUT /presets/{id}`, `DELETE /presets/{id}`
+- [x] Integrare con le API: `GET /presets`, `POST /presets`, `PUT /presets/{id}`, `DELETE /presets/{id}`
 
 ### Floating Toolbar
 
-- [ ] Creare `static/js/view_toolbar.js`:
+- [x] Creare `static/js/view_toolbar.js`:
   - `Toolbar.render(containerEl, session)`: render toolbar per la sessione attiva
   - `Toolbar.renderModelSelector(currentModel)`:
     - Dropdown con modelli preferiti dell'utente (`UserSettingsDB.favorite_models`)
@@ -385,7 +385,7 @@
 
 ### CSS Toolbar e Gallery
 
-- [ ] In `themes.css`, aggiungere:
+- [x] In `themes.css`, aggiungere:
   - `.toolbar`: altezza 48px, border-bottom Neo-Brutalist, background bianco, flex row, align-items center
   - `.toolbar .model-selector`: dropdown Neo-Brutalist (border-2, no border-radius)
   - `.toolbar .attach-btn`: bottone icona 📎
@@ -398,27 +398,27 @@
 
 ### Flusso File Attachment
 
-- [ ] Implementare drag & drop sulla zona terminale:
+- [x] Implementare drag & drop sulla zona terminale:
   - Intercettare `dragover` e `drop` sul container del terminale (non su xterm direttamente)
   - Upload automatico e aggiunta chip nella toolbar
-- [ ] Implementare paste immagine (`Ctrl+V`):
+- [x] Implementare paste immagine (`Ctrl+V`):
   - Intercettare l'evento paste, controllare se ci sono immagini nel clipboard
   - Upload automatico e aggiunta chip
-- [ ] Quando l'utente vuole inviare con allegati:
+- [x] Quando l'utente vuole inviare con allegati:
   - Bottone "📎 Invia con allegati" nella toolbar che scrive i path nel terminale
   - Oppure: un meccanismo che inietta i path nel PTY stdin preceduti da un prompt
 
 ### Verifica Step 06
 
-- [ ] La toolbar appare sopra il terminale con tutti i controlli
-- [ ] Il model selector mostra i modelli preferiti e li cambia nel terminale
-- [ ] Il bottone attach apre il file picker e mostra i chip
-- [ ] Drag & drop di file sulla zona terminale funziona
-- [ ] Il bottone stop ferma il PTY
-- [ ] L'indicatore di connessione mostra lo stato corretto
-- [ ] L'Agent Gallery mostra i preset in una griglia
-- [ ] Click "Avvia" su un preset crea una nuova sessione
-- [ ] Il form di creazione preset funziona e salva nel DB
+- [x] La toolbar appare sopra il terminale con tutti i controlli
+- [x] Il model selector mostra i modelli preferiti e li cambia nel terminale
+- [x] Il bottone attach apre il file picker e mostra i chip
+- [x] Drag & drop di file sulla zona terminale funziona
+- [x] Il bottone stop ferma il PTY
+- [x] L'indicatore di connessione mostra lo stato corretto
+- [x] L'Agent Gallery mostra i preset in una griglia
+- [x] Click "Avvia" su un preset crea una nuova sessione
+- [x] Il form di creazione preset funziona e salva nel DB
 
 ---
 
@@ -428,30 +428,30 @@
 
 ### Backend MCP Apps
 
-- [ ] Creare `app/mcp_apps.py` con APIRouter:
+- [x] Creare `app/mcp_apps.py` con APIRouter:
   - `GET /mcp/apps`: lista delle MCP App disponibili dai server configurati
   - `GET /mcp/apps/{app_id}/proxy`: proxy per richieste verso MCP app server (CORS)
   - `GET /mcp/config`: leggere configurazione MCP
   - `PUT /mcp/config`: aggiornare configurazione MCP
-- [ ] Registrare il router in `app/main.py`
+- [x] Registrare il router in `app/main.py`
 
 ### Frontend MCP Sidebar
 
-- [ ] Creare `static/js/view_mcp_sidebar.js`:
+- [x] Creare `static/js/view_mcp_sidebar.js`:
   - `McpSidebar.render(containerEl)`: render sidebar con lista app e container iframe
   - `McpSidebar.renderAppList(apps)`: lista delle app disponibili con icone
   - `McpSidebar.renderAppFrame(app)`: creare iframe sandboxato (`sandbox="allow-scripts allow-forms allow-same-origin"`)
   - `McpSidebar.openApp(appId)`: caricare app nell'iframe
   - `McpSidebar.closeApp(appId)`: rimuovere iframe
   - `McpSidebar.toggleSidebar()`: toggle visibilità con animazione
-- [ ] Implementare protocollo postMessage per comunicazione iframe ↔ host:
+- [x] Implementare protocollo postMessage per comunicazione iframe ↔ host:
   - App → Host: `{type: 'mcp-app-request', action, data}`
   - Host → App: `{type: 'mcp-app-context', data: {sessionId, projectPath, theme}}`
-- [ ] Aggiungere listener `window.addEventListener('message', handler)` per i messaggi dalle app
+- [x] Aggiungere listener `window.addEventListener('message', handler)` per i messaggi dalle app
 
 ### CSS Sidebar Destra
 
-- [ ] In `themes.css`, aggiungere:
+- [x] In `themes.css`, aggiungere:
   - `.sidebar-right`: larghezza 360px, border-left Neo-Brutalist, overflow-y auto
   - `.mcp-app-frame`: iframe con border Neo-Brutalist, larghezza 100%, altezza variabile
   - `.mcp-app-list`: lista verticale con icone/nomi delle app
@@ -460,18 +460,18 @@
 
 ### Integrazione Layout
 
-- [ ] Aggiornare il CSS Grid principale per supportare il layout a 3 colonne con entrambe le sidebar collassabili
-- [ ] Aggiungere shortcut `Ctrl+E` per toggle sidebar destra
-- [ ] Il terminale al centro deve espandersi quando le sidebar si collassano
+- [x] Aggiornare il CSS Grid principale per supportare il layout a 3 colonne con entrambe le sidebar collassabili
+- [x] Aggiungere shortcut `Ctrl+E` per toggle sidebar destra
+- [x] Il terminale al centro deve espandersi quando le sidebar si collassano
 
 ### Verifica Step 07
 
-- [ ] La sidebar destra appare con la lista delle MCP app (anche se vuota inizialmente)
-- [ ] `Ctrl+E` togla/mostra la sidebar
-- [ ] Se ci sono app MCP configurate, gli iframe si caricano correttamente
-- [ ] Il postMessage funziona tra iframe e host
-- [ ] Il layout si adatta quando le sidebar si aprono/chiudono
-- [ ] Il terminale si ridimensiona automaticamente
+- [x] La sidebar destra appare con la lista delle MCP app (anche se vuota inizialmente)
+- [x] `Ctrl+E` togla/mostra la sidebar
+- [x] Se ci sono app MCP configurate, gli iframe si caricano correttamente
+- [x] Il postMessage funziona tra iframe e host
+- [x] Il layout si adatta quando le sidebar si aprono/chiudono
+- [x] Il terminale si ridimensiona automaticamente
 
 ---
 
@@ -479,24 +479,25 @@
 
 ### Rimozione codice deprecato
 
-- [ ] Eliminare `app/bridge.py` (sostituito da `app/pty_manager.py`)
-- [ ] Eliminare `app/chats.py` (sostituito da `app/projects.py` + `app/sessions.py`)
-- [ ] Rimuovere la tabella `ChatDB` da `app/db.py` (e la migrazione corrispondente)
-- [ ] Rimuovere l'import di `run_claude_stream` e `cancel_session_process` da `app/main.py`
-- [ ] Rimuovere l'import del vecchio `chats_router` da `app/main.py`
-- [ ] Rimuovere tutte le rotte legacy che usavano il bridge SSE:
+- [x] Eliminare `app/bridge.py` (sostituito da `app/pty_manager.py`)
+- [x] Eliminare `app/chats.py` (sostituito da `app/projects.py` + `app/sessions.py`)
+- [x] Rimuovere la tabella `ChatDB` da `app/db.py` (e la migrazione corrispondente)
+- [x] Rimuovere l'import di `run_claude_stream` e `cancel_session_process` da `app/main.py`
+- [x] Rimuovere l'import del vecchio `chats_router` da `app/main.py`
+- [x] Rimuovere tutte le rotte legacy che usavano il bridge SSE:
   - `POST /agents/{agent_slug}/message` (basato su SSE) — sostituito da WebSocket
   - `POST /agents/{agent_slug}/cancel` — sostituito da `PTYManager.kill()`
-- [ ] Pulire `static/js/view_chat.js`: rimuovere tutto il codice SSE/NDJSON (o eliminare il file se completamente sostituito)
+- [x] Pulire `static/js/view_chat.js`: rimuovere tutto il codice SSE/NDJSON (o eliminare il file se completamente sostituito)
 
 ### Verifica finale
 
-- [ ] L'applicazione si avvia senza errori
-- [ ] Nessun import rotto o modulo mancante
-- [ ] È possibile: creare progetto → creare sessione con preset → interagire nel terminale → sospendere → riprendere → archiviare
-- [ ] Le sidebar si aprono/chiudono correttamente
-- [ ] Il model selector funziona
-- [ ] I file si allegano e i path sono utilizzabili
-- [ ] La dot grid è visibile nel terminale
-- [ ] I bordi e le ombre Neo-Brutalist sono coerenti in tutta l'app
-- [ ] Nessun file deprecato è ancora presente nel progetto
+- [x] L'applicazione si avvia senza errori
+- [x] Nessun import rotto o modulo mancante
+- [x] È possibile: creare progetto → creare sessione con preset → interagire nel terminale → sospendere → riprendere → archiviare
+- [x] Le sidebar si aprono/chiudono correttamente
+- [x] Il model selector funziona
+- [x] I file si allegano e i path sono utilizzabili
+- [x] La dot grid è visibile nel terminale
+- [x] I bordi e le ombre Neo-Brutalist sono coerenti in tutta l'app
+- [x] Nessun file deprecato è ancora presente nel progetto
+
