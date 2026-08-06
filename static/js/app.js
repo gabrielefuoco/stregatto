@@ -36,6 +36,13 @@ class App {
         document.addEventListener('mousemove', (e) => {
             document.documentElement.style.setProperty('--mouse-x', `${e.clientX}px`);
             document.documentElement.style.setProperty('--mouse-y', `${e.clientY}px`);
+
+            const termWrapper = document.querySelector('.terminal-wrapper');
+            if (termWrapper) {
+                const rect = termWrapper.getBoundingClientRect();
+                termWrapper.style.setProperty('--mouse-wrapper-x', `${e.clientX - rect.left}px`);
+                termWrapper.style.setProperty('--mouse-wrapper-y', `${e.clientY - rect.top}px`);
+            }
         });
     }
 

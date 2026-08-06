@@ -238,6 +238,7 @@ body.sidebar-collapsed .sidebar-left {
 
 /* Neo-Brutalist Terminal Container */
 .terminal-wrapper {
+  position: relative;
   background-color: #fcfcfc;
   /* Lightened Dot Grid Pattern (13% opacity) behind terminal */
   background-image: radial-gradient(rgba(26, 28, 28, 0.13) 1.1px, transparent 1.1px);
@@ -249,6 +250,22 @@ body.sidebar-collapsed .sidebar-left {
   box-shadow: 6px 6px 0px 0px #1a1c1c;
   border-radius: 0;
   transition: all 0.2s ease;
+}
+
+.terminal-wrapper::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    background-image: radial-gradient(circle 220px at var(--mouse-wrapper-x, -500px) var(--mouse-wrapper-y, -500px), rgba(255, 95, 31, 0.9) 0%, rgba(255, 95, 31, 0.35) 45%, transparent 75%);
+    mask-image: radial-gradient(#000 1.1px, transparent 1.1px);
+    -webkit-mask-image: radial-gradient(#000 1.1px, transparent 1.1px);
+    mask-size: 18px 18px;
+    -webkit-mask-size: 18px 18px;
+    mask-position: 0 0;
+    -webkit-mask-position: 0 0;
+    transition: opacity 0.2s ease;
 }
 
 /* xterm.js overrides for transparency, mouse cursor visibility and spacing */
