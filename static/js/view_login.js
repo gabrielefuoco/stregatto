@@ -11,7 +11,7 @@ export async function renderLoginView() {
                 <div class="w-20 h-20 bg-primary-container border-4 border-on-surface rounded-none flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-sm">
                     <span class="material-symbols-outlined text-[40px] text-on-primary">vpn_key</span>
                 </div>
-                <h1 class="font-headline-lg text-on-surface font-bold">Stregatto OS</h1>
+                <h1 class="font-headline-lg text-on-surface font-bold">Neo-Claudio</h1>
                 <p class="font-body-md text-on-surface-variant">Accedi al tuo spazio neurale</p>
             </div>
 

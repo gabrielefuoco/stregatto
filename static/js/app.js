@@ -126,11 +126,11 @@ class App {
                     </div>
 
                     <div class="w-16 h-16 bg-[#FF5F1F] text-white border-2 border-black flex items-center justify-center text-3xl shadow-[3px_3px_0px_#000] mt-2">
-                        🐱
+                        🤖
                     </div>
 
                     <div class="space-y-1">
-                        <h2 class="text-2xl font-headline font-bold uppercase tracking-tight text-[#1a1c1c]">Stregatto Terminal</h2>
+                        <h2 class="text-2xl font-headline font-bold uppercase tracking-tight text-[#1a1c1c]">Neo-Claudio Terminal</h2>
                         <p class="text-xs text-gray-600 font-medium">Interfaccia Web Multi-Sessione per Claude Code CLI</p>
                     </div>
 

@@ -42,7 +42,7 @@ export class TabBar {
 
                     <!-- Session Selector Dropdown Button -->
                     <button id="btn-session-dropdown" class="neo-btn neo-btn-white neo-btn-sm flex items-center gap-2 shrink-0 border-2 border-black font-bold uppercase shadow-[2px_2px_0px_#000] hover:shadow-[3px_3px_0px_#FF5F1F]">
-                        <span id="active-session-icon">🐱</span>
+                        <span id="active-session-icon">🤖</span>
                         <span id="active-session-name" class="truncate max-w-[140px]">Nessuna Sessione</span>
                         <span class="text-[10px]">▼</span>
                     </button>

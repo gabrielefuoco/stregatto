@@ -101,9 +101,9 @@ async def seed_default_presets(user_id: str = "system"):
     """Crea o aggiorna i 3 preset built-in."""
     presets = [
         {
-            "slug": "system-stregatto-default",
-            "name": "Stregatto",
-            "icon": "🐱",
+            "slug": "system-neo-claudio-default",
+            "name": "Neo-Claudio",
+            "icon": "🤖",
             "description": "L'agente predefinito, sviluppatore full-stack con accesso completo a tutti i tool e permessi.",
             "model": "poolside/laguna-s-2.1:free",
             "permission_mode": "auto",

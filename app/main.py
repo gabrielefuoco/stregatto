@@ -72,9 +72,9 @@ async def get_settings(current_user: AuthUser = Depends(get_current_user)):
     return {
         "settings": [
             {
-                "id": "stregatto_config",
-                "name": "Configurazione Stregatto V3 & OpenRouter",
-                "slug": "stregatto_config",
+                "id": "neo_claudio_config",
+                "name": "Configurazione Neo-Claudio & OpenRouter",
+                "slug": "neo_claudio_config",
                 "schema": {
                     "properties": {
                         "openrouter_key": {
