@@ -78,7 +78,9 @@ export class ProjectsSidebar {
         }
 
         this.container.querySelector('#btn-collapse-sidebar').addEventListener('click', () => {
-            document.body.classList.toggle('sidebar-collapsed');
+            if (this.app && this.app.leftDrawer) {
+                this.app.leftDrawer.toggle();
+            }
         });
         
         // Context menu delegation

@@ -4,7 +4,7 @@ import { TabBar } from './view_tab_bar.js?v=13';
 import { AgentGallery } from './view_agent_gallery.js?v=13';
 import { McpSidebar } from './view_mcp_sidebar.js?v=13';
 import { SettingsView } from './view_settings.js?v=13';
-import { apiFetch } from './ui.js?v=13';
+import { apiFetch, DrawerController } from './ui.js?v=13';
 
 class App {
     constructor() {
@@ -28,6 +28,21 @@ class App {
         }
         this.mcpSidebar.init(mcpContainer);
         window.mcpSidebar = this.mcpSidebar;
+
+        // Controllers parametrici DRY per i Drawer
+        this.leftDrawer = new DrawerController({
+            element: document.getElementById('sidebar-container'),
+            width: '280px',
+            direction: 'left',
+            isOpen: true
+        });
+
+        this.rightDrawer = new DrawerController({
+            element: document.getElementById('mcp-sidebar-container'),
+            width: '360px',
+            direction: 'right',
+            isOpen: false
+        });
 
         this.initGlobalHotkeys();
     }
@@ -174,7 +189,10 @@ class App {
 
             if (e.ctrlKey && !e.shiftKey && e.key.toLowerCase() === 'b') {
                 e.preventDefault();
-                document.body.classList.toggle('sidebar-collapsed');
+                if (this.leftDrawer) this.leftDrawer.toggle();
+            } else if (e.ctrlKey && !e.shiftKey && e.key.toLowerCase() === 'e') {
+                e.preventDefault();
+                if (this.rightDrawer) this.rightDrawer.toggle();
             } else if (e.ctrlKey && !e.shiftKey && e.key.toLowerCase() === 'g') {
                 e.preventDefault();
                 this.showGallery();

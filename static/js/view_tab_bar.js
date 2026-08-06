@@ -29,8 +29,19 @@ export class TabBar {
         this.container.innerHTML = `
             <div class="workspace-header-wrapper flex items-center justify-between bg-white w-full border-b-2 border-black px-3 py-2 gap-3 font-headline text-xs z-20 shrink-0 select-none">
                 
-                <!-- Left Section: Active Session Dropdown & Quick Switcher Chips -->
+                <!-- Left Section: Left Drawer Toggle, Session Selector Dropdown & Quick Switcher Chips -->
                 <div class="flex items-center gap-2 min-w-0 flex-1 overflow-hidden">
+                    <!-- Toggle Left Projects Drawer Button -->
+                    <button id="header-btn-left-drawer" class="neo-btn neo-btn-white neo-btn-sm font-bold flex items-center justify-center p-1.5 shrink-0 border-2 border-black shadow-[2px_2px_0px_#000] hover:bg-[#FF5F1F] hover:text-white transition-colors" title="Apri/Chiudi Sidebar Progetti (Ctrl+B)">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <rect x="3" y="3" width="18" height="18" stroke="currentColor" fill="none"/>
+                            <line x1="9" y1="3" x2="9" y2="21" stroke="currentColor"/>
+                            <path d="M14 12h4m-2-2v4" stroke-linecap="square"/>
+                        </svg>
+                    </button>
+
+                    <div class="w-px h-5 bg-black shrink-0"></div>
+
                     <!-- Session Selector Dropdown Button -->
                     <button id="btn-session-dropdown" class="neo-btn neo-btn-white neo-btn-sm flex items-center gap-2 shrink-0 border-2 border-black font-bold uppercase shadow-[2px_2px_0px_#000] hover:shadow-[3px_3px_0px_#FF5F1F]">
                         <span id="active-session-icon">🐱</span>
@@ -90,6 +101,16 @@ export class TabBar {
     }
 
     bindEvents() {
+        // Left Drawer Toggle button click
+        const leftDrawerBtn = this.container.querySelector('#header-btn-left-drawer');
+        if (leftDrawerBtn) {
+            leftDrawerBtn.addEventListener('click', () => {
+                if (this.app && this.app.leftDrawer) {
+                    this.app.leftDrawer.toggle();
+                }
+            });
+        }
+
         // Session Dropdown button click
         const dropdownBtn = this.container.querySelector('#btn-session-dropdown');
         if (dropdownBtn) {

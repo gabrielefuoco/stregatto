@@ -124,19 +124,13 @@ export class McpSidebar {
     }
 
     toggleSidebar(forceState = null) {
-        this.isOpen = forceState !== null ? forceState : !this.isOpen;
-        const sidebarEl = this.container.querySelector('#mcp-sidebar');
-        
-        if(this.isOpen) {
-            sidebarEl.classList.remove('hidden');
-            sidebarEl.classList.add('flex');
-        } else {
-            sidebarEl.classList.remove('flex');
-            sidebarEl.classList.add('hidden');
+        if (window.stregattoApp && window.stregattoApp.rightDrawer) {
+            if (forceState !== null) {
+                window.stregattoApp.rightDrawer.setOpen(forceState);
+            } else {
+                window.stregattoApp.rightDrawer.toggle();
+            }
         }
-        
-        // Dispatche un resize per aggiustare il terminale!
-        setTimeout(() => window.dispatchEvent(new Event('resize')), 100);
     }
 
     setupPostMessageListener() {

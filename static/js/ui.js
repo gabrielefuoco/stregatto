@@ -261,3 +261,79 @@ export function bindTabGroup(buttons, activeClass, inactiveClass, onSelect) {
     });
 }
 
+/**
+ * Controller Parametrico DRY per la gestione animata dei Drawer (Sidebar SX e DX)
+ */
+export class DrawerController {
+    constructor({ element, width = '280px', direction = 'left', isOpen = true, onToggle }) {
+        this.element = element;
+        this.width = width;
+        this.direction = direction; // 'left' o 'right'
+        this.isOpen = isOpen;
+        this.onToggle = onToggle;
+        
+        this.init();
+    }
+
+    init() {
+        if (!this.element) return;
+        this.element.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+        this.element.style.overflow = 'hidden';
+        this.setOpen(this.isOpen, false);
+    }
+
+    setOpen(open, animate = true) {
+        this.isOpen = open;
+        if (!this.element) return;
+
+        if (!animate) {
+            this.element.style.transition = 'none';
+        } else {
+            this.element.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+        }
+
+        if (open) {
+            this.element.style.display = 'flex';
+            // Forza il reflow prima di applicare la larghezza per attivare l'animazione
+            void this.element.offsetWidth;
+            this.element.style.width = this.width;
+            this.element.style.opacity = '1';
+            if (this.direction === 'left') {
+                this.element.style.marginLeft = '0px';
+            } else {
+                this.element.style.marginRight = '0px';
+            }
+        } else {
+            this.element.style.width = '0px';
+            this.element.style.opacity = '0';
+            if (this.direction === 'left') {
+                this.element.style.marginLeft = `-${this.width}`;
+            } else {
+                this.element.style.marginRight = `-${this.width}`;
+            }
+            if (animate) {
+                setTimeout(() => {
+                    if (!this.isOpen && this.element) this.element.style.display = 'none';
+                }, 310);
+            } else {
+                this.element.style.display = 'none';
+            }
+        }
+
+        if (!animate) {
+            setTimeout(() => {
+                if (this.element) this.element.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+            }, 50);
+        }
+
+        if (this.onToggle) this.onToggle(this.isOpen);
+
+        // Notifica il ridimensionamento a xterm.js
+        setTimeout(() => window.dispatchEvent(new Event('resize')), 320);
+    }
+
+    toggle() {
+        this.setOpen(!this.isOpen);
+    }
+}
+
