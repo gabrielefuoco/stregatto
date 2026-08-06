@@ -45,6 +45,7 @@ class App {
         });
 
         this.initGlobalHotkeys();
+        this.renderEmptyWorkspace();
     }
 
     initMouseGlowEffect() {
@@ -106,7 +107,85 @@ class App {
         }
     }
 
+    renderEmptyWorkspace() {
+        const area = document.getElementById('terminal-area');
+        if (!area) return;
+
+        document.querySelectorAll('.terminal-container').forEach(el => el.style.display = 'none');
+        
+        let welcomeEl = document.getElementById('welcome-hero-screen');
+        if (!welcomeEl) {
+            welcomeEl = document.createElement('div');
+            welcomeEl.id = 'welcome-hero-screen';
+            welcomeEl.className = 'w-full h-full flex flex-col items-center justify-center p-6 bg-transparent z-10 font-body select-none';
+            welcomeEl.innerHTML = `
+                <div class="bg-white border-2 border-black p-8 shadow-[6px_6px_0px_#1a1c1c] max-w-lg w-full text-center flex flex-col items-center gap-5 relative">
+                    <!-- Retro Badge -->
+                    <div class="absolute -top-4 bg-[#FF5F1F] text-white px-3 py-1 text-xs font-headline font-bold uppercase tracking-wider border-2 border-black shadow-[2px_2px_0px_#000]">
+                        ⚡ Neo-Claudio CLI Studio
+                    </div>
+
+                    <div class="w-16 h-16 bg-[#FF5F1F] text-white border-2 border-black flex items-center justify-center text-3xl shadow-[3px_3px_0px_#000] mt-2">
+                        🐱
+                    </div>
+
+                    <div class="space-y-1">
+                        <h2 class="text-2xl font-headline font-bold uppercase tracking-tight text-[#1a1c1c]">Stregatto Terminal</h2>
+                        <p class="text-xs text-gray-600 font-medium">Interfaccia Web Multi-Sessione per Claude Code CLI</p>
+                    </div>
+
+                    <div class="w-full h-px bg-black my-1"></div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex flex-col sm:flex-row items-center gap-3 w-full justify-center">
+                        <button id="hero-btn-new-session" class="neo-btn neo-btn-orange neo-btn-md font-bold w-full sm:w-auto">
+                            + NUOVA SESSIONE
+                        </button>
+                        <button id="hero-btn-gallery" class="neo-btn neo-btn-white neo-btn-md font-bold w-full sm:w-auto">
+                            🤖 AGENT GALLERY
+                        </button>
+                    </div>
+
+                    <!-- Shortcuts Cheatsheet -->
+                    <div class="grid grid-cols-3 gap-2 w-full pt-3 text-[11px] font-headline font-bold">
+                        <div class="bg-[#f9f9f9] border border-black p-2 flex flex-col items-center shadow-[1px_1px_0px_#000]">
+                            <span class="bg-black text-white px-1 font-mono text-[10px] mb-1">Ctrl+B</span>
+                            <span>PROGETTI</span>
+                        </div>
+                        <div class="bg-[#f9f9f9] border border-black p-2 flex flex-col items-center shadow-[1px_1px_0px_#000]">
+                            <span class="bg-black text-white px-1 font-mono text-[10px] mb-1">Ctrl+E</span>
+                            <span>MCP APPS</span>
+                        </div>
+                        <div class="bg-[#f9f9f9] border border-black p-2 flex flex-col items-center shadow-[1px_1px_0px_#000]">
+                            <span class="bg-black text-white px-1 font-mono text-[10px] mb-1">Ctrl+G</span>
+                            <span>GALLERY</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            area.appendChild(welcomeEl);
+
+            welcomeEl.querySelector('#hero-btn-new-session').addEventListener('click', () => {
+                if (this.tabBar) this.tabBar.renderCreateSessionModal();
+            });
+
+            welcomeEl.querySelector('#hero-btn-gallery').addEventListener('click', () => {
+                this.showGallery();
+            });
+        }
+
+        welcomeEl.style.display = 'flex';
+    }
+
     switchActiveTerminal(sessionId) {
+        if (!sessionId) {
+            this.renderEmptyWorkspace();
+            return;
+        }
+
+        const welcomeEl = document.getElementById('welcome-hero-screen');
+        if (welcomeEl) welcomeEl.style.display = 'none';
+
         document.querySelectorAll('.terminal-container').forEach(el => el.style.display = 'none');
         
         let targetEl = document.getElementById(`term-${sessionId}`);
@@ -133,14 +212,14 @@ class App {
              const addons = this.termManager.addons.get(sessionId);
              if (addons && addons.fit) {
                  addons.fit.fit();
-             }
+              }
              term.refresh(0, term.rows - 1);
              term.focus();
         }
     }
 
     clearTerminalArea() {
-        document.querySelectorAll('.terminal-container').forEach(el => el.style.display = 'none');
+        this.renderEmptyWorkspace();
     }
 
     switchView(targetView) {

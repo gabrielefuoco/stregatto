@@ -138,28 +138,41 @@ export class ProjectsSidebar {
     createProjectCard(project) {
         const card = document.createElement('div');
         const isActive = project.id === this.app.activeProjectId;
-        card.className = `project-card p-3 border-2 border-black cursor-pointer relative transition-all mb-1 ${isActive ? 'bg-[#FF5F1F] text-white shadow-[4px_4px_0px_#000] translate-x-[-2px] translate-y-[-2px]' : 'bg-white text-black shadow-[2px_2px_0px_#000] hover:shadow-[4px_4px_0px_#000] hover:translate-x-[-2px] hover:translate-y-[-2px]'}`;
+        card.className = `project-card p-3 border-2 border-black cursor-pointer relative transition-all mb-2 ${isActive ? 'bg-[#FF5F1F] text-white shadow-[4px_4px_0px_#1a1c1c] translate-x-[-2px] translate-y-[-2px]' : 'bg-white text-[#1a1c1c] shadow-[2px_2px_0px_#1a1c1c] hover:shadow-[4px_4px_0px_#FF5F1F] hover:translate-x-[-2px] hover:translate-y-[-2px]'}`;
         card.dataset.id = project.id;
         
-        const badgeVariant = project.mode === 'LOCAL' 
-            ? (isActive ? 'active' : 'local') 
-            : (isActive ? 'active' : 'cloud');
-        const badgeHtml = renderBadge({ text: project.mode, variant: badgeVariant });
-        
+        const modeBadgeClass = project.mode === 'LOCAL'
+            ? (isActive ? 'bg-black text-white border-black' : 'bg-[#e5e5e5] text-black border-black')
+            : (isActive ? 'bg-black text-white border-black' : 'bg-[#FF5F1F] text-white border-black');
+
+        const sessionCount = project.active_sessions_count || (this.app && this.app.terminals ? Array.from(this.app.terminals.values()).filter(t => t.projectId === project.id).length : 0);
+
         card.innerHTML = `
-            <div class="flex items-center gap-3">
-                <span class="text-2xl shrink-0">${project.icon || '📁'}</span>
+            <div class="flex items-start gap-2.5">
+                <div class="w-9 h-9 shrink-0 border-2 border-black flex items-center justify-center font-bold text-base shadow-[1px_1px_0px_#000] ${isActive ? 'bg-black text-white' : 'bg-[#f0f0f0] text-black'}">
+                    ${project.icon || '📁'}
+                </div>
                 <div class="flex-1 min-w-0">
-                    <div class="flex justify-between items-center gap-2">
-                        <h3 class="font-headline font-bold text-sm truncate" title="${project.name}">
+                    <div class="flex items-center justify-between gap-1">
+                        <h3 class="font-headline font-bold text-xs uppercase tracking-tight truncate" title="${project.name}">
                             ${project.pinned ? '📌 ' : ''}${project.name}
                         </h3>
-                        ${badgeHtml}
+                        <span class="text-[9px] font-headline font-bold uppercase px-1.5 py-0.5 border border-black shadow-[1px_1px_0px_#000] ${modeBadgeClass}">
+                            ${project.mode || 'LOCAL'}
+                        </span>
                     </div>
-                    <p class="text-xs font-body ${isActive ? 'text-white/90' : 'text-gray-600'} truncate mt-1" title="${project.path}">${project.path}</p>
+                    <p class="text-[10px] font-mono ${isActive ? 'text-white/90' : 'text-gray-500'} truncate mt-1" title="${project.path}">
+                        ${project.path}
+                    </p>
+                    ${sessionCount > 0 ? `
+                        <div class="mt-2 flex items-center gap-1.5">
+                            <span class="text-[9px] font-headline font-bold uppercase px-1.5 py-0.5 border border-black ${isActive ? 'bg-white text-black' : 'bg-[#FF5F1F] text-white'} shadow-[1px_1px_0px_#000]">
+                                ⚡ ${sessionCount} ${sessionCount === 1 ? 'Sessione' : 'Sessioni'}
+                            </span>
+                        </div>
+                    ` : ''}
                 </div>
             </div>
-            ${project.active_sessions_count > 0 ? `<div class="absolute -top-2 -right-2 bg-black text-white text-xs font-headline font-bold w-5 h-5 flex items-center justify-center border-2 border-black rounded-none shadow-[2px_2px_0px_#000]">${project.active_sessions_count}</div>` : ''}
         `;
         
         card.addEventListener('click', () => {

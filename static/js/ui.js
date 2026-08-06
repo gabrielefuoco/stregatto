@@ -350,7 +350,7 @@ export class BaseSidebarComponent {
     }
 
     renderShell({ searchHtml = '', contentHtml = '', footerHtml = '' }) {
-        const shadowClass = this.direction === 'right' ? 'shadow-[-6px_6px_0px_#FF5F1F]' : 'shadow-[6px_6px_0px_#FF5F1F]';
+        const shadowClass = this.direction === 'right' ? 'shadow-[-4px_4px_0px_#1a1c1c]' : 'shadow-[4px_4px_0px_#1a1c1c]';
         this.container.innerHTML = `
             <div class="flex flex-col h-full w-[${this.width}] border-2 border-black bg-white ${shadowClass} shrink-0 overflow-hidden font-body">
                 <!-- Header Unificato -->
