@@ -31,12 +31,10 @@ export class TabBar {
                 
                 <!-- Left Section: Left Drawer Toggle, Session Selector Dropdown & Quick Switcher Chips -->
                 <div class="flex items-center gap-2 min-w-0 flex-1 overflow-hidden">
-                    <!-- Toggle Left Projects Drawer Button -->
-                    <button id="header-btn-left-drawer" class="neo-btn neo-btn-white neo-btn-sm font-bold flex items-center justify-center p-1.5 shrink-0 border-2 border-black shadow-[2px_2px_0px_#000] hover:bg-[#FF5F1F] hover:text-white transition-colors" title="Apri/Chiudi Sidebar Progetti (Ctrl+B)">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                            <rect x="3" y="3" width="18" height="18" stroke="currentColor" fill="none"/>
-                            <line x1="9" y1="3" x2="9" y2="21" stroke="currentColor"/>
-                            <path d="M14 12h4m-2-2v4" stroke-linecap="square"/>
+                    <!-- Toggle Left Projects Drawer Button (< icon) -->
+                    <button id="header-btn-left-drawer" class="p-1 px-1.5 text-black hover:text-[#FF5F1F] font-headline font-bold flex items-center justify-center shrink-0 transition-colors cursor-pointer" title="Apri/Chiudi Sidebar Progetti (Ctrl+B)">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="square" stroke-linejoin="miter" d="M15 19l-7-7 7-7"/>
                         </svg>
                     </button>
 
@@ -85,12 +83,10 @@ export class TabBar {
 
                     <div class="w-px h-5 bg-black shrink-0"></div>
 
-                    <!-- MCP Apps Sidebar Drawer Icon Button -->
-                    <button id="header-btn-mcp" class="neo-btn neo-btn-black neo-btn-sm font-bold p-1.5 flex items-center justify-center hover:bg-[#FF5F1F] transition-colors" title="Apri Sidebar MCP Apps (Ctrl+E)">
-                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                            <rect x="3" y="3" width="18" height="18" stroke="currentColor" fill="none"/>
-                            <line x1="15" y1="3" x2="15" y2="21" stroke="currentColor"/>
-                            <path d="M8 12h4m-2-2v4" stroke-linecap="square"/>
+                    <!-- MCP Apps Sidebar Toggle Button (> icon) -->
+                    <button id="header-btn-mcp" class="p-1 px-1.5 text-black hover:text-[#FF5F1F] font-headline font-bold flex items-center justify-center shrink-0 transition-colors cursor-pointer" title="Apri/Chiudi Sidebar MCP Apps (Ctrl+E)">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="square" stroke-linejoin="miter" d="M9 5l7 7-7 7"/>
                         </svg>
                     </button>
                 </div>

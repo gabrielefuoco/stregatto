@@ -42,7 +42,6 @@ export class McpSidebar {
                     <h3 class="text-base font-headline font-bold uppercase tracking-tight text-black flex items-center gap-2">
                         <span>⚡</span> <span>MCP APPS</span>
                     </h3>
-                    <button id="btn-close-sidebar" class="neo-btn-icon font-headline font-bold text-lg hover:text-red-500" title="Chiudi (Ctrl+E)">✕</button>
                 </div>
                 
                 <!-- App List / Tabs -->
@@ -69,9 +68,12 @@ export class McpSidebar {
     }
 
     bindEvents() {
-        this.container.querySelector('#btn-close-sidebar').addEventListener('click', () => {
-            this.toggleSidebar(false);
-        });
+        const closeBtn = this.container.querySelector('#btn-close-sidebar');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                this.toggleSidebar(false);
+            });
+        }
 
         this.container.querySelectorAll('.btn-app-tab').forEach(btn => {
             btn.addEventListener('click', (e) => {

@@ -26,9 +26,6 @@ export class ProjectsSidebar {
             <div class="flex flex-col h-full w-[280px] border-2 border-black bg-white shadow-[6px_6px_0px_#000] shrink-0 overflow-hidden">
                 <div class="sidebar-header p-4 border-b-2 border-black flex justify-between items-center bg-white">
                     <h2 class="text-xl font-headline font-bold uppercase tracking-tight text-[#1a1c1c]">Progetti</h2>
-                    <button id="btn-collapse-sidebar" class="neo-btn-icon text-black hover:text-[#FF5F1F]" title="Chiudi (Ctrl+B)">
-                        <span class="material-symbols-outlined">chevron_left</span>
-                    </button>
                 </div>
                 <div class="sidebar-search p-3 bg-[#fbfbfb]">
                     <input type="text" id="search-projects" 
@@ -77,11 +74,14 @@ export class ProjectsSidebar {
             });
         }
 
-        this.container.querySelector('#btn-collapse-sidebar').addEventListener('click', () => {
-            if (this.app && this.app.leftDrawer) {
-                this.app.leftDrawer.toggle();
-            }
-        });
+        const collapseBtn = this.container.querySelector('#btn-collapse-sidebar');
+        if (collapseBtn) {
+            collapseBtn.addEventListener('click', () => {
+                if (this.app && this.app.leftDrawer) {
+                    this.app.leftDrawer.toggle();
+                }
+            });
+        }
         
         // Context menu delegation
         this.container.querySelector('#projects-list').addEventListener('contextmenu', (e) => {
