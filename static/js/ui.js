@@ -299,7 +299,15 @@ export class DrawerController {
             this.element.style.width = this.width;
             this.element.style.opacity = '1';
             this.element.style.pointerEvents = 'auto';
+            if (animate) {
+                setTimeout(() => {
+                    if (this.isOpen && this.element) this.element.style.overflow = 'visible';
+                }, 310);
+            } else {
+                this.element.style.overflow = 'visible';
+            }
         } else {
+            this.element.style.overflow = 'hidden';
             this.element.style.width = '0px';
             this.element.style.opacity = '0';
             this.element.style.pointerEvents = 'none';
