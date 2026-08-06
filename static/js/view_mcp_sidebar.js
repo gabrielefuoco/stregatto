@@ -15,7 +15,8 @@ export class McpSidebar {
             containerEl: this.container,
             title: 'MCP APPS',
             icon: '⚡',
-            width: '360px'
+            width: '360px',
+            direction: 'right'
         });
         await this.loadApps();
         this.render();

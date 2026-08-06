@@ -333,16 +333,18 @@ export class DrawerController {
  * Componente Padre Parametrico per la struttura visiva delle Sidebar (Progetti & MCP Apps)
  */
 export class BaseSidebarComponent {
-    constructor({ containerEl, title, icon = '', width = '280px' }) {
+    constructor({ containerEl, title, icon = '', width = '280px', direction = 'left' }) {
         this.container = containerEl;
         this.title = title;
         this.icon = icon;
         this.width = width;
+        this.direction = direction;
     }
 
     renderShell({ searchHtml = '', contentHtml = '', footerHtml = '' }) {
+        const shadowClass = this.direction === 'right' ? 'shadow-[-6px_6px_0px_#000]' : 'shadow-[6px_6px_0px_#000]';
         this.container.innerHTML = `
-            <div class="flex flex-col h-full w-[${this.width}] border-2 border-black bg-white shadow-[6px_6px_0px_#000] shrink-0 overflow-hidden font-body">
+            <div class="flex flex-col h-full w-[${this.width}] border-2 border-black bg-white ${shadowClass} shrink-0 overflow-hidden font-body">
                 <!-- Header Unificato -->
                 <div class="sidebar-header p-4 border-b-2 border-black flex justify-between items-center bg-white shrink-0">
                     <h2 class="text-xl font-headline font-bold uppercase tracking-tight text-[#1a1c1c] flex items-center gap-2">
