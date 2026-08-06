@@ -35,12 +35,14 @@ export class McpSidebar {
     render() {
         // Layout della sidebar di destra come Floating Card (Opzione B)
         const html = `
-            <div id="mcp-sidebar" class="sidebar-right neo-card-floating h-full w-[360px] flex flex-col z-20 shrink-0 ${this.isOpen ? 'flex' : 'hidden'}">
+            <div id="mcp-sidebar" class="sidebar-right bg-white border-2 border-black shadow-[6px_6px_0px_#000] h-full w-[360px] flex flex-col z-20 shrink-0 ${this.isOpen ? 'flex' : 'hidden'}">
                 
                 <!-- Header -->
-                <div class="h-14 border-b-2 border-black bg-white flex justify-between items-center px-4 shrink-0">
-                    <h3 class="text-lg font-headline font-bold uppercase tracking-tight text-black">MCP APPS</h3>
-                    <button id="btn-close-sidebar" class="neo-btn-icon font-headline font-bold text-xl hover:text-red-500" title="Chiudi">✕</button>
+                <div class="h-13 border-b-2 border-black bg-white flex justify-between items-center px-4 shrink-0">
+                    <h3 class="text-base font-headline font-bold uppercase tracking-tight text-black flex items-center gap-2">
+                        <span>⚡</span> <span>MCP APPS</span>
+                    </h3>
+                    <button id="btn-close-sidebar" class="neo-btn-icon font-headline font-bold text-lg hover:text-red-500" title="Chiudi (Ctrl+E)">✕</button>
                 </div>
                 
                 <!-- App List / Tabs -->

@@ -238,15 +238,15 @@ body.sidebar-collapsed .sidebar-left {
 
 /* Neo-Brutalist Terminal Container */
 .terminal-wrapper {
-  background-color: #fdfdfd;
-  /* Dot Grid Pattern */
-  background-image: radial-gradient(#1a1c1c 1.1px, transparent 1.1px);
+  background-color: #ffffff;
+  /* Lightened Dot Grid Pattern so it doesn't distract in terminal */
+  background-image: radial-gradient(rgba(26, 28, 28, 0.07) 1.1px, transparent 1.1px);
   background-size: 18px 18px;
   background-position: 0 0;
   
   /* Neo-Brutalist borders and shadow */
   border: 2px solid #1a1c1c;
-  box-shadow: 4px 4px 0px 0px #1a1c1c;
+  box-shadow: 6px 6px 0px 0px #1a1c1c;
   border-radius: 0;
   transition: all 0.2s ease;
 }

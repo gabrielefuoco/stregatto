@@ -2,7 +2,6 @@ import { TerminalManager } from './terminal.js?v=13';
 import { ProjectsSidebar } from './view_projects_sidebar.js?v=13';
 import { TabBar } from './view_tab_bar.js?v=13';
 import { AgentGallery } from './view_agent_gallery.js?v=13';
-import { Toolbar } from './view_toolbar.js?v=13';
 import { McpSidebar } from './view_mcp_sidebar.js?v=13';
 import { SettingsView } from './view_settings.js?v=13';
 import { apiFetch } from './ui.js?v=13';
@@ -12,10 +11,11 @@ class App {
         this.activeProjectId = null;
         this.termManager = new TerminalManager();
         
+        this.initMouseGlowEffect();
         this.initWorkspaceLayout();
         
         this.sidebar = new ProjectsSidebar(document.getElementById('sidebar-container'), this);
-        this.tabBar = new TabBar(document.getElementById('tab-bar-container'), this);
+        this.tabBar = new TabBar(document.getElementById('workspace-header-container'), this);
         this.agentGallery = new AgentGallery(this);
         this.settingsView = new SettingsView(this);
         this.mcpSidebar = new McpSidebar(this);
@@ -32,11 +32,18 @@ class App {
         this.initGlobalHotkeys();
     }
 
+    initMouseGlowEffect() {
+        document.addEventListener('mousemove', (e) => {
+            document.documentElement.style.setProperty('--mouse-x', `${e.clientX}px`);
+            document.documentElement.style.setProperty('--mouse-y', `${e.clientY}px`);
+        });
+    }
+
     initWorkspaceLayout() {
         const layout = document.querySelector('.app-layout');
         if (!layout) return;
 
-        // Permanent Option B Layout: Floating Card Workspace (Spacious, Airy & Chunky)
+        // Floating Card Workspace (Spacious & Chunky Soft Neo-Brutalist)
         layout.className = 'app-layout h-full flex flex-row bg-[#f0f0f0] bg-blueprint p-3 gap-3 font-body overflow-hidden';
         
         const sidebar = document.getElementById('sidebar-container');
@@ -51,7 +58,7 @@ class App {
 
         const termWrapper = document.querySelector('.terminal-wrapper');
         if (termWrapper) {
-            termWrapper.className = 'terminal-wrapper flex flex-col flex-grow relative bg-white border-3 border-black shadow-[8px_8px_0px_#000] rounded-none overflow-hidden';
+            termWrapper.className = 'terminal-wrapper flex flex-col flex-grow relative bg-white border-2 border-black shadow-[6px_6px_0px_#000] rounded-none overflow-hidden';
         }
     }
 
@@ -87,33 +94,14 @@ class App {
             targetEl.className = 'terminal-container h-full w-full relative';
             document.getElementById('terminal-area').appendChild(targetEl);
             
-            const toolbarContainer = document.createElement('div');
-            toolbarContainer.id = `toolbar-${sessionId}`;
-            targetEl.appendChild(toolbarContainer);
-            
             const termViewport = document.createElement('div');
-            termViewport.className = 'term-viewport-inner h-[calc(100%-48px)] w-full';
+            termViewport.className = 'term-viewport-inner h-full w-full';
             targetEl.appendChild(termViewport);
             
             this.termManager.create(sessionId, termViewport);
             const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
             const wsUrl = `${protocol}//${window.location.host}/ws/pty/${sessionId}`;
             this.termManager.connect(sessionId, wsUrl);
-            
-            const toolbar = new Toolbar({ id: sessionId }, {
-                sendData: (data) => {
-                    const conn = this.termManager.connections.get(sessionId);
-                    const ws = conn ? conn.ws : null;
-                    if (ws && ws.readyState === WebSocket.OPEN) {
-                        try {
-                            ws.send(new TextEncoder().encode(data));
-                        } catch (err) {
-                            console.error("Error sending toolbar input:", err);
-                        }
-                    }
-                }
-            });
-            toolbar.render(toolbarContainer);
         }
         
         targetEl.style.display = 'block';
