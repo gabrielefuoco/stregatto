@@ -24,5 +24,5 @@ COPY . .
 ENV PORT=80
 EXPOSE 80
 
-# Avvio diretto senza proxy
-CMD ["uv", "run", "python", "-m", "cat.main"]
+# Avvio del server FastAPI Neo-Claudio
+CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80"]
