@@ -239,8 +239,8 @@ body.sidebar-collapsed .sidebar-left {
 /* Neo-Brutalist Terminal Container */
 .terminal-wrapper {
   background-color: #fcfcfc;
-  /* Distinct, visible Dot Grid Pattern behind terminal */
-  background-image: radial-gradient(rgba(26, 28, 28, 0.22) 1.2px, transparent 1.2px);
+  /* Lightened Dot Grid Pattern (13% opacity) behind terminal */
+  background-image: radial-gradient(rgba(26, 28, 28, 0.13) 1.1px, transparent 1.1px);
   background-size: 18px 18px;
   background-position: 0 0;
   
@@ -251,13 +251,30 @@ body.sidebar-collapsed .sidebar-left {
   transition: all 0.2s ease;
 }
 
-/* xterm.js overrides for transparency, cursor visibility and spacing */
+/* xterm.js overrides for transparency, mouse cursor visibility and spacing */
 .xterm-viewport, .xterm-rows, .xterm-screen {
   background-color: transparent !important;
 }
-.terminal-container, .term-viewport-inner, .xterm, .xterm-screen, .xterm-screen canvas, .xterm-viewport {
-  cursor: text !important;
+
+/* Force visible mouse cursor over terminal wrapper, container, viewport, and xterm canvas */
+.terminal-wrapper,
+.terminal-wrapper *,
+#terminal-area,
+#terminal-area *,
+.terminal-container,
+.terminal-container *,
+.term-viewport-inner,
+.term-viewport-inner *,
+.xterm,
+.xterm *,
+.xterm-viewport,
+.xterm-screen,
+.xterm-screen canvas,
+.xterm-rows,
+.xterm-helper-textarea {
+  cursor: auto !important;
 }
+
 .xterm-screen {
   padding: 8px;
 }
