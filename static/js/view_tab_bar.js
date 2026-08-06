@@ -3,7 +3,7 @@
  * Barra Unificata del Workspace e Gestione Sessioni (Soft Neo-Brutalist)
  */
 
-import { apiFetch, createContextMenu, createModal, renderFormField, confirmModal, showToast } from './ui.js?v=13';
+import { apiFetch, createContextMenu, createModal, renderFormField, confirmModal, showToast } from './ui.js?v=30';
 
 export class TabBar {
     constructor(containerEl, app) {

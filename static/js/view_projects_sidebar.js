@@ -3,7 +3,7 @@
  * Gestisce la sidebar dei progetti con stile Neo-Brutalist
  */
 
-import { apiFetch, createContextMenu, createModal, renderFormField, renderBadge, confirmModal, bindSearchInput, BaseSidebarComponent } from './ui.js?v=13';
+import { apiFetch, createContextMenu, createModal, renderFormField, renderBadge, confirmModal, bindSearchInput, BaseSidebarComponent } from './ui.js?v=30';
 
 export class ProjectsSidebar {
     constructor(containerEl, app) {

@@ -1,10 +1,10 @@
-import { TerminalManager } from './terminal.js?v=13';
-import { ProjectsSidebar } from './view_projects_sidebar.js?v=13';
-import { TabBar } from './view_tab_bar.js?v=13';
-import { AgentGallery } from './view_agent_gallery.js?v=13';
-import { McpSidebar } from './view_mcp_sidebar.js?v=13';
-import { SettingsView } from './view_settings.js?v=13';
-import { apiFetch, DrawerController } from './ui.js?v=13';
+import { TerminalManager } from './terminal.js?v=30';
+import { ProjectsSidebar } from './view_projects_sidebar.js?v=30';
+import { TabBar } from './view_tab_bar.js?v=30';
+import { AgentGallery } from './view_agent_gallery.js?v=30';
+import { McpSidebar } from './view_mcp_sidebar.js?v=30';
+import { SettingsView } from './view_settings.js?v=30';
+import { apiFetch, DrawerController } from './ui.js?v=30';
 
 class App {
     constructor() {
@@ -70,7 +70,7 @@ class App {
         
         const sidebar = document.getElementById('sidebar-container');
         if (sidebar) {
-            sidebar.className = 'sidebar-left h-full flex flex-col bg-white border-2 border-black shadow-[6px_6px_0px_#000] z-20 shrink-0';
+            sidebar.className = 'sidebar-left h-full flex flex-col z-20 shrink-0';
         }
         
         const mainContent = document.getElementById('main-content');

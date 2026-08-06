@@ -1,4 +1,4 @@
-import { apiFetch, showToast, BaseSidebarComponent } from './ui.js?v=13';
+import { apiFetch, showToast, BaseSidebarComponent } from './ui.js?v=30';
 
 export class McpSidebar {
     constructor(apiClient) {
