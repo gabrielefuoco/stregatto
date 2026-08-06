@@ -74,16 +74,14 @@ export class TabBar {
 
                     <div class="w-px h-5 bg-black shrink-0"></div>
 
-                    <!-- MCP Apps Sidebar Toggle Button -->
-                    <button id="header-btn-mcp" class="neo-btn neo-btn-black neo-btn-sm font-bold flex items-center gap-1" title="Apri Sidebar MCP Apps (Ctrl+E)">
-                        <span>⚡</span> <span class="hidden md:inline">MCP Apps</span>
+                    <!-- MCP Apps Sidebar Drawer Icon Button -->
+                    <button id="header-btn-mcp" class="neo-btn neo-btn-black neo-btn-sm font-bold p-1.5 flex items-center justify-center hover:bg-[#FF5F1F] transition-colors" title="Apri Sidebar MCP Apps (Ctrl+E)">
+                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <rect x="3" y="3" width="18" height="18" stroke="currentColor" fill="none"/>
+                            <line x1="15" y1="3" x2="15" y2="21" stroke="currentColor"/>
+                            <path d="M8 12h4m-2-2v4" stroke-linecap="square"/>
+                        </svg>
                     </button>
-
-                    <!-- Connection Status Indicator -->
-                    <div id="ws-status-indicator" class="flex items-center gap-1.5 text-[11px] font-bold uppercase ml-1" title="Stato Connessione PTY WebSocket">
-                        <span class="status-dot w-2.5 h-2.5 bg-green-500 border border-black inline-block animate-pulse"></span>
-                        <span class="hidden lg:inline">Connesso</span>
-                    </div>
                 </div>
             </div>
         `;
