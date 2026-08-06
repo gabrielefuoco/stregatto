@@ -70,7 +70,7 @@ class App {
         
         const sidebar = document.getElementById('sidebar-container');
         if (sidebar) {
-            sidebar.className = 'h-full flex flex-col z-20 shrink-0';
+            sidebar.className = 'sidebar-left h-full flex flex-col bg-white border-2 border-black shadow-[6px_6px_0px_#000] z-20 shrink-0';
         }
         
         const mainContent = document.getElementById('main-content');

@@ -190,7 +190,16 @@ body {
   overflow: hidden;
 }
 
-/* Layout helper classes */
+.sidebar-left {
+  border-right: 2px solid #1a1c1c;
+  width: 280px;
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+}
+
+body.sidebar-collapsed .sidebar-left {
+  margin-left: -280px; /* Nasconde la sidebar */
+}
 
 /* Effetti Project Card */
 .project-card {
@@ -218,34 +227,13 @@ body {
 }
 .neo-btn-icon {
     transition: transform 0.15s, color 0.15s;
-/* DRY Neo-Brutalist Drawer Theme Classes */
-.neo-drawer-card {
-    background-color: #ffffff;
-    border: 2px solid #1a1c1c;
-    box-shadow: 6px 6px 0px 0px #1a1c1c;
-    border-radius: 0px;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    flex-shrink: 0;
+}
+.neo-btn-icon:hover {
+    transform: scale(1.1);
 }
 
-.neo-drawer-header {
-    height: 52px;
-    background-color: #ffffff;
-    border-bottom: 2px solid #1a1c1c;
-    padding: 0 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-shrink: 0;
-}
-
-.neo-drawer-body {
-    flex: 1;
-    background-color: #ffffff;
-    overflow-y: auto;
+.sidebar-right {
+  width: 360px;
 }
 
 /* Neo-Brutalist Terminal Container */
