@@ -35,7 +35,7 @@ export class McpSidebar {
     render() {
         // Layout della sidebar di destra come Floating Card (Opzione B)
         const html = `
-            <div id="mcp-sidebar" class="sidebar-right bg-white border-2 border-black shadow-[6px_6px_0px_#000] h-full w-[360px] flex flex-col z-20 shrink-0 ${this.isOpen ? 'flex' : 'hidden'}">
+            <div id="mcp-sidebar" class="flex flex-col h-full w-[360px] border-2 border-black bg-white shadow-[6px_6px_0px_#000] shrink-0 overflow-hidden">
                 
                 <!-- Header -->
                 <div class="h-13 border-b-2 border-black bg-white flex justify-between items-center px-4 shrink-0">

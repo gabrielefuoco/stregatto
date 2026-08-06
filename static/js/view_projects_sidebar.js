@@ -23,7 +23,7 @@ export class ProjectsSidebar {
 
     renderShell() {
         this.container.innerHTML = `
-            <div class="sidebar-left flex flex-col h-full border-r-2 border-black bg-[#fbfbfb]">
+            <div class="flex flex-col h-full w-[280px] border-2 border-black bg-white shadow-[6px_6px_0px_#000] shrink-0 overflow-hidden">
                 <div class="sidebar-header p-4 border-b-2 border-black flex justify-between items-center bg-white">
                     <h2 class="text-xl font-headline font-bold uppercase tracking-tight text-[#1a1c1c]">Progetti</h2>
                     <button id="btn-collapse-sidebar" class="neo-btn-icon text-black hover:text-[#FF5F1F]" title="Chiudi (Ctrl+B)">

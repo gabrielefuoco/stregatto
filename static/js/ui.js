@@ -277,8 +277,9 @@ export class DrawerController {
 
     init() {
         if (!this.element) return;
-        this.element.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+        this.element.style.transition = 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease';
         this.element.style.overflow = 'hidden';
+        this.element.style.flexShrink = '0';
         this.setOpen(this.isOpen, false);
     }
 
@@ -289,28 +290,19 @@ export class DrawerController {
         if (!animate) {
             this.element.style.transition = 'none';
         } else {
-            this.element.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+            this.element.style.transition = 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease';
         }
 
         if (open) {
             this.element.style.display = 'flex';
-            // Forza il reflow prima di applicare la larghezza per attivare l'animazione
             void this.element.offsetWidth;
             this.element.style.width = this.width;
             this.element.style.opacity = '1';
-            if (this.direction === 'left') {
-                this.element.style.marginLeft = '0px';
-            } else {
-                this.element.style.marginRight = '0px';
-            }
+            this.element.style.pointerEvents = 'auto';
         } else {
             this.element.style.width = '0px';
             this.element.style.opacity = '0';
-            if (this.direction === 'left') {
-                this.element.style.marginLeft = `-${this.width}`;
-            } else {
-                this.element.style.marginRight = `-${this.width}`;
-            }
+            this.element.style.pointerEvents = 'none';
             if (animate) {
                 setTimeout(() => {
                     if (!this.isOpen && this.element) this.element.style.display = 'none';
@@ -322,7 +314,7 @@ export class DrawerController {
 
         if (!animate) {
             setTimeout(() => {
-                if (this.element) this.element.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+                if (this.element) this.element.style.transition = 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease';
             }, 50);
         }
 
