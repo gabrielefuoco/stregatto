@@ -1,4 +1,4 @@
-import { apiFetch, showToast } from './ui.js?v=13';
+import { apiFetch, showToast, BaseSidebarComponent } from './ui.js?v=13';
 
 export class McpSidebar {
     constructor(apiClient) {
@@ -6,10 +6,17 @@ export class McpSidebar {
         this.apps = [];
         this.activeAppId = null;
         this.isOpen = false;
+        this.baseSidebar = null;
     }
 
     async init(containerEl) {
         this.container = containerEl;
+        this.baseSidebar = new BaseSidebarComponent({
+            containerEl: this.container,
+            title: 'MCP APPS',
+            icon: '⚡',
+            width: '360px'
+        });
         await this.loadApps();
         this.render();
         this.setupPostMessageListener();
@@ -33,37 +40,25 @@ export class McpSidebar {
     }
 
     render() {
-        // Layout della sidebar di destra come Floating Card (Opzione B)
-        const html = `
-            <div id="mcp-sidebar" class="flex flex-col h-full w-[360px] border-2 border-black bg-white shadow-[6px_6px_0px_#000] shrink-0 overflow-hidden">
-                
-                <!-- Header -->
-                <div class="h-13 border-b-2 border-black bg-white flex justify-between items-center px-4 shrink-0">
-                    <h3 class="text-base font-headline font-bold uppercase tracking-tight text-black flex items-center gap-2">
-                        <span>⚡</span> <span>MCP APPS</span>
-                    </h3>
-                </div>
-                
-                <!-- App List / Tabs -->
-                <div class="mcp-app-list border-b border-black/10 bg-white flex flex-wrap gap-2 p-3 shrink-0">
+        this.baseSidebar.renderShell({
+            searchHtml: `
+                <div class="mcp-app-list border-b-2 border-black bg-[#fbfbfb] flex flex-wrap gap-2 p-3 shrink-0">
                     ${this.apps.map(app => `
-                        <button class="btn-app-tab neo-btn neo-btn-white neo-btn-sm" data-appid="${app.id}" title="${app.description}">
-                            <span class="text-lg">${app.icon}</span> <span>${app.name}</span>
+                        <button class="btn-app-tab neo-btn neo-btn-white neo-btn-sm font-bold flex items-center gap-1.5 shadow-[2px_2px_0px_#000] hover:shadow-[3px_3px_0px_#FF5F1F]" data-appid="${app.id}" title="${app.description}">
+                            <span class="text-base">${app.icon}</span> <span>${app.name}</span>
                         </button>
                     `).join('')}
                 </div>
-
-                <!-- Iframe Container -->
-                <div id="mcp-frame-container" class="flex-grow relative bg-[#f9f9f9] p-4 flex flex-col items-center justify-center overflow-hidden">
+            `,
+            contentHtml: `
+                <div id="mcp-frame-container" class="flex-1 w-full h-full flex flex-col items-center justify-center bg-[#fbfbfb] p-2">
                     <div class="flex flex-col items-center justify-center font-headline text-xs uppercase tracking-wide font-bold p-6 text-center text-black bg-white border-2 border-black shadow-[4px_4px_0px_#000] max-w-[280px]">
                         <span class="text-4xl mb-3">🔌</span>
                         <p class="leading-relaxed">Seleziona un'app in alto per avviarla e connettere il server MCP.</p>
                     </div>
                 </div>
-            </div>
-        `;
-        
-        this.container.innerHTML = html;
+            `
+        });
         this.bindEvents();
     }
 

@@ -3,7 +3,7 @@
  * Gestisce la sidebar dei progetti con stile Neo-Brutalist
  */
 
-import { apiFetch, createContextMenu, createModal, renderFormField, renderBadge, confirmModal, bindSearchInput } from './ui.js?v=13';
+import { apiFetch, createContextMenu, createModal, renderFormField, renderBadge, confirmModal, bindSearchInput, BaseSidebarComponent } from './ui.js?v=13';
 
 export class ProjectsSidebar {
     constructor(containerEl, app) {
@@ -12,6 +12,12 @@ export class ProjectsSidebar {
         if (this.app) this.app.projectsSidebar = this;
         this.projects = [];
         this.searchQuery = '';
+        this.baseSidebar = new BaseSidebarComponent({
+            containerEl: this.container,
+            title: 'Progetti',
+            icon: '📁',
+            width: '280px'
+        });
         this.init();
     }
 
@@ -22,36 +28,31 @@ export class ProjectsSidebar {
     }
 
     renderShell() {
-        this.container.innerHTML = `
-            <div class="flex flex-col h-full w-[280px] border-2 border-black bg-white shadow-[6px_6px_0px_#000] shrink-0 overflow-hidden">
-                <div class="h-13 border-b-2 border-black bg-white flex justify-between items-center px-4 shrink-0">
-                    <h2 class="text-base font-headline font-bold uppercase tracking-tight text-[#1a1c1c] flex items-center gap-2">
-                        <span>📁</span> <span>Progetti</span>
-                    </h2>
-                </div>
-                <div class="sidebar-search p-3 bg-white border-b border-black/10 shrink-0">
+        this.baseSidebar.renderShell({
+            searchHtml: `
+                <div class="sidebar-search p-3 bg-[#fbfbfb] border-b-2 border-black shrink-0">
                     <input type="text" id="search-projects" 
-                           class="w-full neo-input p-2 font-headline text-xs font-bold border-2 border-black shadow-[2px_2px_0px_#000] focus:shadow-[3px_3px_0px_#FF5F1F]" 
+                           class="w-full neo-input p-2 font-headline text-sm font-semibold border-2 border-black shadow-[2px_2px_0px_#000] focus:shadow-[4px_4px_0px_#FF5F1F]" 
                            placeholder="Cerca progetti...">
                 </div>
-                <div id="projects-list" class="sidebar-content flex-1 overflow-y-auto p-3 flex flex-col gap-2.5 bg-[#f9f9f9]">
-                    <!-- Project cards will be rendered here -->
-                </div>
+            `,
+            contentHtml: `<div id="projects-list" class="flex-1 flex flex-col gap-2"></div>`,
+            footerHtml: `
                 <div class="sidebar-footer p-3 border-t-2 border-black bg-white flex flex-col gap-2 shrink-0">
-                    <button id="btn-new-project" class="neo-btn neo-btn-orange neo-btn-md w-full">
+                    <button id="btn-new-project" class="neo-btn neo-btn-orange neo-btn-md w-full font-bold">
                         + NUOVO PROGETTO
                     </button>
                     <div class="grid grid-cols-2 gap-2">
-                        <button id="btn-agent-gallery" class="neo-btn neo-btn-white neo-btn-sm" title="Crea o Seleziona Agent (Ctrl+G)">
+                        <button id="btn-agent-gallery" class="neo-btn neo-btn-white neo-btn-sm font-bold" title="Crea o Seleziona Agent (Ctrl+G)">
                             🤖 Agents
                         </button>
-                        <button id="btn-open-settings" class="neo-btn neo-btn-white neo-btn-sm" title="Impostazioni Sistema">
+                        <button id="btn-open-settings" class="neo-btn neo-btn-white neo-btn-sm font-bold" title="Impostazioni Sistema">
                             ⚙️ Settings
                         </button>
                     </div>
                 </div>
-            </div>
-        `;
+            `
+        });
     }
 
     attachEventListeners() {

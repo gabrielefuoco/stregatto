@@ -329,3 +329,40 @@ export class DrawerController {
     }
 }
 
+/**
+ * Componente Padre Parametrico per la struttura visiva delle Sidebar (Progetti & MCP Apps)
+ */
+export class BaseSidebarComponent {
+    constructor({ containerEl, title, icon = '', width = '280px' }) {
+        this.container = containerEl;
+        this.title = title;
+        this.icon = icon;
+        this.width = width;
+    }
+
+    renderShell({ searchHtml = '', contentHtml = '', footerHtml = '' }) {
+        this.container.innerHTML = `
+            <div class="flex flex-col h-full w-[${this.width}] border-2 border-black bg-white shadow-[6px_6px_0px_#000] shrink-0 overflow-hidden font-body">
+                <!-- Header Unificato -->
+                <div class="sidebar-header p-4 border-b-2 border-black flex justify-between items-center bg-white shrink-0">
+                    <h2 class="text-xl font-headline font-bold uppercase tracking-tight text-[#1a1c1c] flex items-center gap-2">
+                        ${this.icon ? `<span class="text-lg">${this.icon}</span>` : ''}
+                        <span>${this.title}</span>
+                    </h2>
+                </div>
+
+                <!-- Sub-Header / Ricerca / App Selector -->
+                ${searchHtml}
+
+                <!-- Contenuto Principale -->
+                <div id="sidebar-main-content" class="sidebar-content flex-1 overflow-y-auto p-3 flex flex-col gap-3">
+                    ${contentHtml}
+                </div>
+
+                <!-- Footer (Opzionale) -->
+                ${footerHtml}
+            </div>
+        `;
+    }
+}
+
